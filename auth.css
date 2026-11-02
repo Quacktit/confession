@@ -1,0 +1,9 @@
+.auth-wrap{max-width:420px;margin:8vh auto;padding:0 20px}
+.auth-card{background:var(--charcoal);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:28px}
+.auth-card h1{margin:0 0 4px;color:var(--yellow)}
+.field{display:block;width:100%;background:var(--black);color:var(--text);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:12px;margin:12px 0;font:inherit}
+.field:focus{outline:2px solid var(--yellow)}
+.auth-card .btn{width:100%;margin-top:8px}
+.switch{margin-top:16px;text-align:center}
+.switch button{background:none;border:0;color:var(--yellow);font:inherit;cursor:pointer}
+.error{color:#ff6b6b;min-height:1.4em;margin:8px 0 0}
