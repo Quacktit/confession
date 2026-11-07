@@ -289,6 +289,9 @@ button.danger:hover, .btn-danger:hover, .reject:hover, .delete:hover {
   background: var(--border-color);
   border-radius: 999px;
 }
+.back-link{display:inline-block;margin-bottom:20px}
+.read-card{background:var(--charcoal);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:28px}
+.read-text{white-space:pre-wrap;word-break:break-word;font-size:1.1rem;margin:0 0 16px}
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-primary);
