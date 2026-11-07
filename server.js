@@ -19,8 +19,35 @@ if (!SECRET) {
   SECRET = fs.readFileSync(SECRET_FILE, 'utf8');
 }
 
-const db = fs.existsSync(DB_FILE) ? JSON.parse(fs.readFileSync(DB_FILE, 'utf8')) : { users: [], posts: [], drafts: {} };
-const save = () => fs.writeFileSync(DB_FILE, JSON.stringify(db));
+let db = fs.existsSync(DB_FILE) ? JSON.parse(fs.readFileSync(DB_FILE, 'utf8')) : { users: [], posts: [], drafts: {} };
+let mongoCollection = null;
+
+if (process.env.MONGO_URI) {
+  const client = new MongoClient(process.env.MONGO_URI);
+  client.connect().then(async () => {
+    mongoCollection = client.db('unspokenadc').collection('app_state');
+    const cloudData = await mongoCollection.findOne({ _id: 'main_db' });
+    if (cloudData) {
+      db.users = cloudData.users || [];
+      db.posts = cloudData.posts || [];
+      db.drafts = cloudData.drafts || {};
+    } else {
+      await mongoCollection.insertOne({ _id: 'main_db', ...db });
+    }
+    console.log('Connected to MongoDB Cloud Storage');
+  }).catch(err => console.error('MongoDB Error:', err));
+}
+
+const save = () => {
+  fs.writeFileSync(DB_FILE, JSON.stringify(db));
+  if (mongoCollection) {
+    mongoCollection.updateOne(
+      { _id: 'main_db' },
+      { $set: { users: db.users, posts: db.posts, drafts: db.drafts } },
+      { upsert: true }
+    ).catch(err => console.error('Save Error:', err));
+  }
+};
 const emailKey = (e) => crypto.createHash('sha256').update(e.trim().toLowerCase()).digest('hex');
 
 const ADMIN_KEY = ADMIN_EMAIL ? emailKey(ADMIN_EMAIL) : null;
