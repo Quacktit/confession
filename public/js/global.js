@@ -57,11 +57,7 @@ async function initConfessions() {
       const card = document.createElement('article'); card.className = 'card';
       const text = document.createElement('p'); text.className = 'card-text'; text.textContent = post.text;
       const meta = document.createElement('div'); meta.className = 'card-meta'; meta.textContent = formatDate(post.createdAt);
-      let counted = false;
-      card.addEventListener('click', () => {
-        card.classList.toggle('open');
-        if (!counted) { counted = true; api('/api/confessions/' + post.id + '/view', { method: 'POST' }).catch(() => {}); }
-      });
+           card.addEventListener('click', () => { window.location.href = '/confession.html?id=' + post.id; });
       card.append(text, meta); feed.append(card);
     });
   }
