@@ -69,45 +69,37 @@ a{color:var(--yellow);text-decoration:none}
 
 
 /* ==========================================
-   UNSPOKENADC GLOBAL VIBE THEME (NO BACKLIGHT)
-   Palette: Flat Graphite-Charcoal & Amber-Yellow
+   UNSPOKENADC STRICT DESIGN SYSTEM
    ========================================== */
 
-/* 1. TYPOGRAPHY (Space Grotesk + Plus Jakarta Sans + JetBrains Mono) */
+/* 1. TYPOGRAPHY IMPORTS */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap');
 
+/* 2. EXACT COLOR PALETTE & VARIABLES */
 :root {
-  /* Surface Layers (Flat Matte Charcoal Shades) */
-  --bg-page: #1c1d21 !important;        /* Matte Graphite */
-  --bg-card: #25272c !important;        /* Elevated Charcoal */
-  --bg-input: #18191c !important;       /* Recessed Slate */
-  --border-subtle: #353840 !important;  /* Muted Gunmetal */
+  --bg-page: #1c1d21;
+  --bg-card: #25272c;
+  --bg-input: #18191c;
+  --bg-card-hover: #2c2f36;
+  --border-color: #353840;
+  --accent-primary: #f5b700;
+  --accent-hover: #ffd147;
+  --accent-text: #18191c;
+  --support-bg: #1e2631;
+  --support-border: #2e435e;
+  --support-highlight: #38bdf8;
+  --text-main: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-placeholder: #6b7280;
   
-  /* Accent & Typographical Color Systems */
-  --accent-primary: #f5b700 !important; /* Warm Amber Gold */
-  --accent-hover: #ffd147 !important;   /* Luminous Marigold */
-  --danger: #ef4444 !important;          /* Moderation/Rejection red */
-  
-  /* Support Banner Accents (Calm Sky Blue & Slate Tint) */
-  --support-blue: #38bdf8 !important;
-  --support-tint: #1e293b !important;
-
-  /* Typography Colors */
-  --text-main: #f3f4f6 !important;      /* Soft Chalk White */
-  --text-secondary: #9ca3af !important; /* Cool Pewter */
-  --text-placeholder: #6b7280 !important;
-
-  /* Common Aliases for overrides */
-  --bg: var(--bg-page);
-  --card: var(--bg-card);
-  --text: var(--text-main);
-  --muted: var(--text-secondary);
-  --primary: var(--accent-primary);
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
   --radius: 12px;
   --radius-sm: 8px;
 }
 
-/* 2. GLOBAL RESET & BASE STYLING (Strict Flat Matte Background) */
+/* 3. GLOBAL RESET & BASE STYLING */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -116,29 +108,33 @@ html, body {
   margin: 0;
   padding: 0;
   background-color: var(--bg-page) !important;
-  background-image: none !important; /* Removes top ambient backlight */
+  background-image: none !important;
   color: var(--text-main) !important;
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-family: var(--font-body) !important;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
 
-/* 3. HEADERS, LOGOS & TYPOGRAPHY */
+/* 4. HEADERS, LOGOS & TYPOGRAPHY */
 h1, h2, h3, h4, .logo, .brand, header strong {
-  font-family: 'Space Grotesk', sans-serif !important;
+  font-family: var(--font-display) !important;
   letter-spacing: -0.025em;
-  color: var(--text-main) !important;
+  color: var(--text-main);
   margin-top: 0;
 }
 
-/* Accent coloring for "adc" in unspokenadc */
+/* Header Logo Rule: "unspoken" in main text, "adc" in primary accent */
+.logo, .brand, .logo-text, .brand-text {
+  color: var(--text-main) !important;
+}
+
 .logo span, .brand span, .brand-text span {
   color: var(--accent-primary) !important;
 }
 
-/* Meta Labels: Anonymous IDs, Timestamps, Badges */
+/* Secondary Text, Timestamps & IDs */
 small, time, .meta, .timestamp, .badge, .tag, .anon-id, code {
-  font-family: 'JetBrains Mono', monospace !important;
+  font-family: var(--font-mono) !important;
   font-size: 0.8rem;
   color: var(--text-secondary) !important;
   letter-spacing: -0.01em;
@@ -155,47 +151,47 @@ a:hover {
   text-decoration: underline;
 }
 
-/* 4. NAVIGATION BAR (Solid Elevated Charcoal, No Blur Glow) */
+/* 5. NAVIGATION BAR */
 header, nav, .navbar, .topbar {
-  background: var(--bg-card) !important;
+  background-color: var(--bg-card) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  border-bottom: 1px solid var(--border-subtle) !important;
+  border-bottom: 1px solid var(--border-color) !important;
   box-shadow: none !important;
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
-/* 5. CARDS, CONFESSION POSTS & CONTAINERS (Crisp Borders, Zero Glow) */
+/* 6. CONFESSION CARDS & THREAD CONTAINERS */
 .card, .post, .confession, .confession-card, .post-card, .panel, .box, article, form.card {
   background-color: var(--bg-card) !important;
-  border: 1px solid var(--border-subtle) !important;
+  border: 1px solid var(--border-color) !important;
   border-radius: var(--radius) !important;
-  box-shadow: none !important; /* No outer glow or heavy shadow */
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  box-shadow: none !important;
   padding: 1.5rem;
   margin-bottom: 1.25rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .card:hover, .post:hover, .confession-card:hover, .post-card:hover, article:hover {
+  background-color: var(--bg-card-hover) !important;
   border-color: var(--accent-primary) !important;
-  box-shadow: none !important;
 }
 
-/* 6. INPUTS & TEXTAREAS (Recessed Slate Layer, Crisp Focus Border) */
+/* 7. TEXTAREAS & INPUT FIELDS (Recessed Slate look) */
 input:not([type="checkbox"]):not([type="radio"]),
 textarea,
 select {
   background-color: var(--bg-input) !important;
   color: var(--text-main) !important;
-  border: 1px solid var(--border-subtle) !important;
+  border: 1px solid var(--border-color) !important;
   border-radius: var(--radius-sm) !important;
   padding: 0.75rem 1rem;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: var(--font-body) !important;
   font-size: 0.95rem;
   box-shadow: none !important;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 input::placeholder,
@@ -203,23 +199,23 @@ textarea::placeholder {
   color: var(--text-placeholder) !important;
 }
 
-/* Clean solid yellow border on focus without outer halo glow */
+/* Input Focus Glow Rule */
 input:focus,
 textarea:focus,
 select:focus {
   outline: none !important;
   border-color: var(--accent-primary) !important;
-  box-shadow: none !important;
+  box-shadow: 0 0 0 3px rgba(245, 183, 0, 0.15) !important;
 }
 
-/* 7. BUTTONS (Dark Charcoal Text on Warm Amber Gold, No Hover Glow) */
+/* 8. PRIMARY BUTTONS RULE */
 button, .btn, input[type="submit"], button[type="submit"] {
-  font-family: 'Space Grotesk', sans-serif !important;
+  font-family: var(--font-display) !important;
   font-weight: 600 !important;
   font-size: 0.92rem;
   letter-spacing: 0.01em;
   background-color: var(--accent-primary) !important;
-  color: var(--bg-input) !important; /* Dark Charcoal Text (#18191C) */
+  color: var(--accent-text) !important; /* #18191C Dark Charcoal */
   border: 1px solid transparent !important;
   border-radius: var(--radius-sm) !important;
   padding: 0.65rem 1.25rem;
@@ -229,7 +225,7 @@ button, .btn, input[type="submit"], button[type="submit"] {
 }
 
 button:hover, .btn:hover, input[type="submit"]:hover, button[type="submit"]:hover {
-  background-color: var(--accent-hover) !important;
+  background-color: var(--accent-hover) !important; /* #FFD147 */
   box-shadow: none !important;
 }
 
@@ -241,7 +237,7 @@ button:active, .btn:active {
 button.secondary, .btn-secondary, .btn-outline, .tab, .filter-btn {
   background-color: var(--bg-input) !important;
   color: var(--text-main) !important;
-  border: 1px solid var(--border-subtle) !important;
+  border: 1px solid var(--border-color) !important;
   box-shadow: none !important;
 }
 
@@ -251,10 +247,10 @@ button.secondary:hover, .btn-secondary:hover, .btn-outline:hover, .tab:hover {
   background-color: var(--bg-card) !important;
 }
 
-/* Urgent / Resources Banner (Tele-MANAS 14416 / 112) */
+/* 9. TELE-MANAS SUPPORT BANNER RULE */
 .support-banner, .resources-card, .banner-alert {
-  background-color: var(--support-tint) !important;
-  border: 1px solid var(--support-blue) !important;
+  background-color: var(--support-bg) !important;
+  border: 1px solid var(--support-border) !important;
   color: var(--text-main) !important;
   border-radius: var(--radius);
   padding: 1.25rem;
@@ -262,12 +258,11 @@ button.secondary:hover, .btn-secondary:hover, .btn-outline:hover, .tab:hover {
   box-shadow: none !important;
 }
 
-.support-banner a, .resources-card a {
-  color: var(--support-blue) !important;
-  font-weight: 600;
+.support-banner a, .resources-card a, .support-banner strong, .resources-card strong {
+  color: var(--support-highlight) !important;
 }
 
-/* Danger/Moderate/Reject Actions */
+/* 10. DANGER / MODERATION ACTIONS */
 button.danger, .btn-danger, .reject, .delete, button[data-action="reject"], button[data-action="delete"] {
   background-color: rgba(239, 68, 68, 0.14) !important;
   color: #f87171 !important;
@@ -276,11 +271,11 @@ button.danger, .btn-danger, .reject, .delete, button[data-action="reject"], butt
 }
 
 button.danger:hover, .btn-danger:hover, .reject:hover, .delete:hover {
-  background-color: var(--danger) !important;
+  background-color: #ef4444 !important;
   color: #ffffff !important;
 }
 
-/* Custom Scrollbar */
+/* 11. SCROLLBAR */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -291,7 +286,7 @@ button.danger:hover, .btn-danger:hover, .reject:hover, .delete:hover {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-subtle);
+  background: var(--border-color);
   border-radius: 999px;
 }
 
