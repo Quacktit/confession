@@ -7,7 +7,6 @@ const jwt = require('jsonwebtoken');
 const { MongoClient } = require('mongodb');
 
 const PORT = process.env.PORT || 3000;
-const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || '').toLowerCase(); // reviewer account
 const ALLOWED_DOMAIN = (process.env.ALLOWED_DOMAIN || '').toLowerCase(); // e.g. "adc.edu.in" (optional)
 const DB_FILE = path.join(__dirname, 'data', 'db.json');
 const SECRET_FILE = path.join(__dirname, 'data', 'secret.key');
@@ -49,10 +48,61 @@ const save = () => {
   }
 };
 const emailKey = (e) => crypto.createHash('sha256').update(e.trim().toLowerCase()).digest('hex');
+const SECURE = process.env.RENDER || process.env.NODE_ENV === 'production' ? '; Secure' : '';
+const EKEY = process.env.EMAIL_ENC_KEY ? Buffer.from(process.env.EMAIL_ENC_KEY, 'hex') : null;
+const enc = (s) => {
+  if (!EKEY) return null;
+  const iv = crypto.randomBytes(12);
+  const c = crypto.createCipheriv('aes-256-gcm', EKEY, iv);
+  const d = Buffer.concat([c.update(s, 'utf8'), c.final()]);
+  return [iv, c.getAuthTag(), d].map((b) => b.toString('base64')).join('.');
+};
+const dec = (s) => {
+  if (!EKEY || !s) return null;
+  try {
+    const [iv, tag, d] = s.split('.').map((x) => Buffer.from(x, 'base64'));
+    const c = crypto.createDecipheriv('aes-256-gcm', EKEY, iv);
+    c.setAuthTag(tag);
+    return Buffer.concat([c.update(d), c.final()]).toString('utf8');
+  } catch { return null; }
+};
+db.users.forEach((u) => { if (u.email) { if (EKEY) u.emailEnc = enc(u.email); delete u.email; } });
+save();
 
-const ADMIN_KEY = ADMIN_EMAIL ? emailKey(ADMIN_EMAIL) : null;
+const hits = new Map();
+const limit = (max, windowMs) => (req, res, next) => {
+  const k = req.originalUrl.split('?')[0] + '|' + req.ip, now = Date.now();
+  const h = (hits.get(k) || []).filter((t) => now - t < windowMs);
+  if (h.length >= max) return res.status(429).json({ error: 'Too many attempts. Try again later.' });
+  h.push(now); hits.set(k, h); next();
+};
+setInterval(() => hits.clear(), 60 * 60 * 1000);
+
+const adminFails = new Map();
+const adminOnly = (req, res, next) => {
+  const now = Date.now();
+  const f = (adminFails.get(req.ip) || []).filter((t) => now - t < 15 * 60 * 1000);
+  if (f.length >= 5) return res.status(429).json({ error: 'Too many attempts. Try again later.' });
+  const real = process.env.ADMIN_KEY || '';
+  const a = crypto.createHash('sha256').update(String(req.headers['x-admin-key'] || '')).digest();
+  const b = crypto.createHash('sha256').update(real).digest();
+  if (real.length < 20 || !crypto.timingSafeEqual(a, b)) {
+    f.push(now); adminFails.set(req.ip, f);
+    return res.status(403).json({ error: 'Wrong admin key.' });
+  }
+  next();
+};
+
 const app = express();
-app.use(express.json({ limit: '5mb' }));
+app.set('trust proxy', 1);
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  next();
+});
+app.use(express.json({ limit: '1mb' }));
 
 const readCookie = (req, name) => {
   const m = (req.headers.cookie || '').split(';').map((c) => c.trim()).find((c) => c.startsWith(name + '='));
@@ -64,9 +114,10 @@ const auth = (req, res, next) => {
 };
 const setToken = (res, uid) => {
   const t = jwt.sign({ uid }, SECRET, { expiresIn: '30d' });
-  res.setHeader('Set-Cookie', `token=${t}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000`);
+    res.setHeader('Set-Cookie', `token=${t}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000${SECURE}`);
 };
 
+app.use(['/api/login', '/api/signup', '/api/forgot', '/api/reset'], limit(10, 15 * 60 * 1000));
 app.post('/api/signup', (req, res) => {
   const { email = '', password = '' } = req.body;
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Enter a valid email.' });
@@ -74,7 +125,7 @@ app.post('/api/signup', (req, res) => {
   if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters.' });
   const key = emailKey(email);
   if (db.users.some((u) => u.key === key)) return res.status(409).json({ error: 'Account already exists.' });
-  const user = { id: crypto.randomUUID(), key, email: email.trim().toLowerCase(), hash: bcrypt.hashSync(password, 12) };
+  const user = { id: crypto.randomUUID(), key, emailEnc: enc(email.trim().toLowerCase()), hash: bcrypt.hashSync(password, 12) };
   db.users.push(user); save(); setToken(res, user.id); res.json({ ok: true });
 });
 
@@ -82,15 +133,13 @@ app.post('/api/login', (req, res) => {
   const { email = '', password = '' } = req.body;
   const user = db.users.find((u) => u.key === emailKey(email));
   if (!user || !bcrypt.compareSync(password, user.hash)) return res.status(401).json({ error: 'Wrong email or password.' });
-  if (!user.email) { user.email = email.trim().toLowerCase(); save(); }
+  if (!user.emailEnc && EKEY) { user.emailEnc = enc(email.trim().toLowerCase()); save(); }
   setToken(res, user.id); res.json({ ok: true });
 });
 
 app.post('/api/logout', (req, res) => {
   res.setHeader('Set-Cookie', 'token=; HttpOnly; Path=/; Max-Age=0'); res.json({ ok: true });
 });
-const isAdmin = (uid) => { const u = db.users.find((x) => x.id === uid); return !!(u && ADMIN_KEY && u.key === ADMIN_KEY); };
-const adminOnly = (req, res, next) => (isAdmin(req.uid) ? next() : res.status(403).json({ error: 'Not allowed.' }));
 
 app.put('/api/confessions/:id', auth, (req, res) => {
   const p = db.posts.find((x) => x.id === req.params.id && x.uid === req.uid);
@@ -105,12 +154,8 @@ app.put('/api/confessions/:id', auth, (req, res) => {
 });
 
 
-app.get('/api/admin/posts', auth, adminOnly, (req, res) => {
-  const s = req.query.status;
-  const list = db.posts.filter((p) => !s || p.status === s).sort((a, b) => b.createdAt - a.createdAt);
-  res.json(list.map((p) => ({ ...pub(p), status: p.status })));
-});
-app.put('/api/admin/posts/:id/update', auth, adminOnly, (req, res) => {
+
+app.put('/api/admin/posts/:id/update', adminOnly, (req, res) => {
   const p = db.posts.find((x) => x.id === req.params.id);
   if (!p) return res.status(404).json({ error: 'Post not found.' });
   const { text, status } = req.body;
@@ -123,14 +168,14 @@ app.put('/api/admin/posts/:id/update', auth, adminOnly, (req, res) => {
     if (!VALID.includes(status)) return res.status(400).json({ error: 'Invalid status.' });
     p.status = status;
   }
-  save(); res.json({ ok: true });
+ save(); res.json({ email: (u && dec(u.emailEnc)) || null });
 });
-app.delete('/api/admin/posts/:id', auth, adminOnly, (req, res) => {
+app.delete('/api/admin/posts/:id', adminOnly, (req, res) => {
   const i = db.posts.findIndex((x) => x.id === req.params.id);
   if (i < 0) return res.status(404).json({ error: 'Post not found.' });
   db.posts.splice(i, 1); save(); res.json({ ok: true });
 });
-app.get('/api/admin/posts/:id/author', auth, adminOnly, (req, res) => {
+app.get('/api/admin/posts/:id/author', adminOnly, (req, res) => {
   const p = db.posts.find((x) => x.id === req.params.id);
   if (!p) return res.status(404).json({ error: 'Post not found.' });
   const u = db.users.find((x) => x.id === p.uid);
@@ -138,7 +183,7 @@ app.get('/api/admin/posts/:id/author', auth, adminOnly, (req, res) => {
   save(); res.json({ email: (u && u.email) || null });
 });
 
-app.get('/api/me', auth, (req, res) => res.json({ ok: true, admin: isAdmin(req.uid) }));
+app.get('/api/me', auth, (req, res) => res.json({ ok: true }));
 
 // Public shape never includes author info.
 const pub = (p) => ({ id: p.id, text: p.text, createdAt: p.createdAt, views: p.views });
@@ -182,10 +227,10 @@ app.get('/api/my', auth, (req, res) => {
   res.json({ posts: mine, draft: db.drafts[req.uid] || null });
 });
 // Reviewer endpoints: never expose author ids.
-app.get('/api/admin/pending', auth, adminOnly, (req, res) => {
+app.get('/api/admin/pending', adminOnly, (req, res) => {
   res.json(db.posts.filter((p) => p.status === 'pending').sort((a, b) => a.createdAt - b.createdAt).map(pub));
 });
-app.put('/api/admin/posts/:id', auth, adminOnly, (req, res) => {
+app.put('/api/admin/posts/:id', adminOnly, (req, res) => {
   const p = db.posts.find((x) => x.id === req.params.id && x.status === 'pending');
   if (!p) return res.status(404).json({ error: 'Post not found.' });
   const { action, text } = req.body;
