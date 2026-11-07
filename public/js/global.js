@@ -143,7 +143,6 @@ async function initMyConfessions() {
     if (!draft && !posts.length) list.append(el('p', 'empty', 'You have not shared anything yet.'));
   }
 
-  document.addEventListener('click', () => document.querySelectorAll('.menu-wrap.open').forEach((w) => w.classList.remove('open')));
   await load();
 }
 
