@@ -73,47 +73,17 @@ a{color:var(--yellow);text-decoration:none}
    ========================================== */
 
 /* 1. TYPOGRAPHY IMPORTS */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Caveat:wght@500&family=Hind:wght@400;500&display=swap');
 /* 2. EXACT COLOR PALETTE & VARIABLES */
-:root {
-  --bg-page: #1c1d21;
-  --bg-card: #25272c;
-  --bg-input: #18191c;
-  --bg-card-hover: #2c2f36;
-  --border-color: #353840;
-  --accent-primary: #f5b700;
-  --accent-hover: #ffd147;
-  --accent-text: #18191c;
-  --support-bg: #1e2631;
-  --support-border: #2e435e;
-  --support-highlight: #38bdf8;
-  --text-main: #f3f4f6;
-  --text-secondary: #9ca3af;
-  --text-placeholder: #6b7280;
-  
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --radius: 12px;
-  --radius-sm: 8px;
-}
+:root{--black:#0b0b0c;--charcoal:#1c1d20;--charcoal-2:#26272b;--grey:#8a8d93;--text:#e8e8ea;--yellow:#f5c518;--ink:#1E1E1E;--radius:12px;--font-heading:'Fraunces',serif;--font-body:'Inter','Hind',sans-serif;--font-accent:'Caveat',cursive}
 
 /* 3. GLOBAL RESET & BASE STYLING */
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--bg-page) !important;
-  background-image: none !important;
-  color: var(--text-main) !important;
-  font-family: var(--font-body) !important;
-  line-height: 1.65;
-  -webkit-font-smoothing: antialiased;
-}
+html, body{margin:0;background:var(--black);color:var(--text);font-family:var(--font-body);font-size:17px;font-weight:400;line-height:1.65;min-height:100vh}
+
 
 /* 4. HEADERS, LOGOS & TYPOGRAPHY */
 h1, h2, h3, h4, .logo, .brand, header strong {
@@ -295,4 +265,22 @@ button.danger:hover, .btn-danger:hover, .reject:hover, .delete:hover {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-primary);
+}
+
+/* ---- typography system ---- */
+h1,h2,h3,.brand,.prompt,.page-title{font-family:var(--font-heading);font-weight:600;line-height:1.2;letter-spacing:-0.01em}
+.brand{font-size:24px}
+h1,.prompt,.page-title{font-size:38px}
+h2,.helpline h2,.policy h2{font-size:26px;font-weight:500}
+.muted,.card-meta,.site-footer,.badge{font-size:14px}
+.badge{font-weight:600;color:var(--ink)}
+.read-text{font-size:17px}
+.btn,.tab.active{font-weight:600;color:var(--ink)}
+.tab{font-weight:500}
+.site-nav a,.site-nav button{font-size:16px;font-weight:500}
+strong{font-weight:600}
+.accent{display:block;font-family:var(--font-accent);font-weight:500;font-size:21px;line-height:1.2;color:var(--yellow);margin:0 0 4px}
+@media (max-width:600px){
+  h1,.prompt,.page-title{font-size:29px}
+  h2,.helpline h2,.policy h2{font-size:22px}
 }
