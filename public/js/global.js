@@ -286,9 +286,35 @@ async function initConfession() {
   } catch (e) { text.textContent = e.message; }
 }
 
+function addPasswordToggles() {
+  const attrs = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+  const eye = '<svg ' + attrs + '><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const eyeOff = '<svg ' + attrs + '><path d="M17.94 17.94A10.9 10.9 0 0 1 12 19c-7 0-11-7-11-7a19.8 19.8 0 0 1 5.06-5.94M9.9 4.24A10.9 10.9 0 0 1 12 5c7 0 11 7 11 7a19.9 19.9 0 0 1-3.17 4.19M1 1l22 22"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/></svg>';
+  document.querySelectorAll('input[type="password"]').forEach((input) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'pw-wrap';
+    input.parentNode.insertBefore(wrap, input);
+    wrap.append(input);
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'pw-toggle';
+    b.setAttribute('aria-label', 'Show password');
+    b.innerHTML = eye;
+    b.addEventListener('click', () => {
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      b.innerHTML = show ? eyeOff : eye;
+      b.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    });
+    wrap.append(b);
+  });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
  const pages = { confessions: initConfessions, confession: initConfession, 'my-confessions': initMyConfessions, privacy: initPrivacy, login: initAuth, admin: initAdmin };
   const init = pages[document.body.dataset.page];
   if (init) init();
+  document.addEventListener('DOMContentLoaded', () => {
+  addPasswordToggles();
+  const pages = { ... };   // leave the rest exactly as it is
 });
