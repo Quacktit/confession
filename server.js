@@ -74,7 +74,7 @@ app.post('/api/signup', (req, res) => {
   if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters.' });
   const key = emailKey(email);
   if (db.users.some((u) => u.key === key)) return res.status(409).json({ error: 'Account already exists.' });
-  const user = { id: crypto.randomUUID(), key, email: email.trim().toLowerCase(), hash: bcrypt.hashSync(password, 12) };const user = { id: crypto.randomUUID(), key, email: email.trim().toLowerCase(), hash: bcrypt.hashSync(password, 12) };
+  const user = { id: crypto.randomUUID(), key, email: email.trim().toLowerCase(), hash: bcrypt.hashSync(password, 12) };
   db.users.push(user); save(); setToken(res, user.id); res.json({ ok: true });
 });
 
