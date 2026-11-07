@@ -82,20 +82,77 @@ async function initMyConfessions() {
   await requireAuth();
   bindLogout();
   const list = document.getElementById('my-list');
-  const { posts, draft } = await api('/api/my');
-  function card(text, meta, isDraft, status) {
-    const c = document.createElement('article'); c.className = 'card' + (isDraft ? ' draft' : '');
-    if (isDraft) { const b = document.createElement('span'); b.className = 'badge'; b.textContent = 'DRAFT'; c.append(b); }
-    const p = document.createElement('p'); p.className = 'card-text'; p.textContent = text;
-    const m = document.createElement('div'); m.className = 'card-meta';
-    if (isDraft) { const a = document.createElement('a'); a.href = '/confessions.html'; a.textContent = 'Continue writing → '; m.append(a, document.createTextNode(meta)); }
-    else m.textContent = meta;
-    if (status && status !== 'approved') { const b = document.createElement('span'); b.className = 'badge'; b.textContent = status === 'pending' ? 'IN REVIEW' : 'NOT PUBLISHED'; c.prepend(b); }
-    c.append(p, m); return c;
+  const notice = document.getElementById('my-notice');
+
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text) e.textContent = text;
+    return e;
   }
-  if (draft) list.append(card(draft.text, 'Autosaved ' + formatDate(draft.updatedAt), true));
-  posts.forEach((p) => list.append(card(p.text, formatDate(p.createdAt), false, p.status)));
-  if (!draft && !posts.length) { const e = document.createElement('p'); e.className = 'empty'; e.textContent = 'You have not shared anything yet.'; list.append(e); }
+
+  function draftCard(d) {
+    const c = el('article', 'card draft');
+    const m = el('div', 'card-meta');
+    const a = el('a', '', 'Continue writing → '); a.href = '/confessions.html';
+    m.append(a, document.createTextNode('Autosaved ' + formatDate(d.updatedAt)));
+    c.append(el('span', 'badge', 'DRAFT'), el('p', 'card-text', d.text), m);
+    return c;
+  }
+
+  function startEdit(textEl, post) {
+    const ta = el('textarea', 'review-text'); ta.value = post.text;
+    const warn = el('p', 'review-note', 'Saving sends this post back for review before it appears publicly.');
+    const row = el('div', 'review-actions');
+    const save = el('button', 'btn', 'Save changes'); save.type = 'button';
+    const cancel = el('button', 'btn btn-reject', 'Cancel'); cancel.type = 'button';
+    row.append(save, cancel);
+    textEl.replaceWith(ta);
+    ta.after(warn, row);
+    cancel.addEventListener('click', load);
+    save.addEventListener('click', async () => {
+      save.disabled = true;
+      try {
+        const res = await api('/api/confessions/' + post.id, { method: 'PUT', body: JSON.stringify({ text: ta.value }) });
+        if (res.changed) { notice.textContent = 'Your post was updated and is being reviewed before it is published.'; notice.hidden = false; }
+        load();
+      } catch (e) { alert(e.message); save.disabled = false; }
+    });
+  }
+
+  function postCard(post) {
+    const c = el('article', 'card');
+    const top = el('div', 'card-top');
+    const label = post.status === 'pending' ? 'IN REVIEW' : post.status === 'rejected' ? 'NOT PUBLISHED' : '';
+    top.append(label ? el('span', 'badge', label) : el('span'));
+    const wrap = el('div', 'menu-wrap');
+    const dots = el('button', 'dots-btn', '⋮'); dots.type = 'button'; dots.setAttribute('aria-label', 'Post options');
+    const menu = el('div', 'menu');
+    const editBtn = el('button', 'menu-item', 'Edit'); editBtn.type = 'button';
+    menu.append(editBtn); wrap.append(dots, menu); top.append(wrap);
+    const text = el('p', 'card-text', post.text);
+    c.append(top, text, el('div', 'card-meta', formatDate(post.createdAt)));
+    if (post.status === 'pending') c.append(el('p', 'review-note', 'This post is being reviewed before it is published.'));
+    if (post.status === 'rejected') c.append(el('p', 'review-note', 'This post was not published. Edit it and it will be reviewed again.'));
+    dots.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.menu-wrap.open').forEach((w) => { if (w !== wrap) w.classList.remove('open'); });
+      wrap.classList.toggle('open');
+    });
+    editBtn.addEventListener('click', () => { wrap.classList.remove('open'); startEdit(text, post); });
+    return c;
+  }
+
+  async function load() {
+    const { posts, draft } = await api('/api/my');
+    list.replaceChildren();
+    if (draft) list.append(draftCard(draft));
+    posts.forEach((p) => list.append(postCard(p)));
+    if (!draft && !posts.length) list.append(el('p', 'empty', 'You have not shared anything yet.'));
+  }
+
+  document.addEventListener('click', () => document.querySelectorAll('.menu-wrap.open').forEach((w) => w.classList.remove('open')));
+  await load();
 }
 
 async function initPrivacy() {
