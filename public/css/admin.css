@@ -1,6 +1,0 @@
-.page-title{font-size:2rem;margin:0 0 8px;color:var(--yellow)}
-.review-card{background:var(--charcoal);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px}
-.review-text{width:100%;min-height:140px;resize:vertical;background:var(--black);color:var(--text);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:12px;font:inherit}
-.review-text:focus{outline:2px solid var(--yellow)}
-.review-actions{display:flex;gap:10px;margin-top:10px}
-.btn-reject{background:var(--charcoal-2);color:var(--text)}

@@ -1,7 +1,0 @@
-.page-title{font-size:2rem;margin:0 0 24px;color:var(--yellow)}
-.card{background:var(--charcoal);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px}
-.card.draft{border:1px dashed var(--yellow)}
-.badge{display:inline-block;background:var(--yellow);color:var(--black);font-size:.7rem;font-weight:800;border-radius:6px;padding:2px 8px;margin-bottom:8px}
-.card-text{margin:0 0 10px;white-space:pre-wrap;word-break:break-word}
-.card-meta{color:var(--grey);font-size:.8rem}
-.empty{color:var(--grey)}
