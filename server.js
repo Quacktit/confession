@@ -74,7 +74,7 @@ app.post('/api/signup', (req, res) => {
   if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters.' });
   const key = emailKey(email);
   if (db.users.some((u) => u.key === key)) return res.status(409).json({ error: 'Account already exists.' });
-  const user = { id: crypto.randomUUID(), key, hash: bcrypt.hashSync(password, 12) };
+  const user = { id: crypto.randomUUID(), key, email: email.trim().toLowerCase(), hash: bcrypt.hashSync(password, 12) };const user = { id: crypto.randomUUID(), key, email: email.trim().toLowerCase(), hash: bcrypt.hashSync(password, 12) };
   db.users.push(user); save(); setToken(res, user.id); res.json({ ok: true });
 });
 
@@ -82,6 +82,7 @@ app.post('/api/login', (req, res) => {
   const { email = '', password = '' } = req.body;
   const user = db.users.find((u) => u.key === emailKey(email));
   if (!user || !bcrypt.compareSync(password, user.hash)) return res.status(401).json({ error: 'Wrong email or password.' });
+  if (!user.email) { user.email = email.trim().toLowerCase(); save(); }
   setToken(res, user.id); res.json({ ok: true });
 });
 
@@ -94,12 +95,47 @@ const adminOnly = (req, res, next) => (isAdmin(req.uid) ? next() : res.status(40
 app.put('/api/confessions/:id', auth, (req, res) => {
   const p = db.posts.find((x) => x.id === req.params.id && x.uid === req.uid);
   if (!p) return res.status(404).json({ error: 'Post not found.' });
+  if (p.status === 'private') return res.status(403).json({ error: 'This post was hidden by the site reviewer.' });
   const text = String(req.body.text || '').trim();
   if (!text) return res.status(400).json({ error: 'Write something first.' });
   if (text === p.text) return res.json({ ok: true, changed: false });
   p.original = p.original || p.text;
   p.text = text; p.edited = true; p.status = 'pending';
   save(); res.json({ ok: true, changed: true });
+});
+
+
+app.get('/api/admin/posts', auth, adminOnly, (req, res) => {
+  const s = req.query.status;
+  const list = db.posts.filter((p) => !s || p.status === s).sort((a, b) => b.createdAt - a.createdAt);
+  res.json(list.map((p) => ({ ...pub(p), status: p.status })));
+});
+app.put('/api/admin/posts/:id/update', auth, adminOnly, (req, res) => {
+  const p = db.posts.find((x) => x.id === req.params.id);
+  if (!p) return res.status(404).json({ error: 'Post not found.' });
+  const { text, status } = req.body;
+  if (text !== undefined) {
+    const t = String(text).trim();
+    if (!t) return res.status(400).json({ error: 'Text cannot be empty.' });
+    if (t !== p.text) { p.original = p.original || p.text; p.text = t; p.edited = true; }
+  }
+  if (status !== undefined) {
+    if (!VALID.includes(status)) return res.status(400).json({ error: 'Invalid status.' });
+    p.status = status;
+  }
+  save(); res.json({ ok: true });
+});
+app.delete('/api/admin/posts/:id', auth, adminOnly, (req, res) => {
+  const i = db.posts.findIndex((x) => x.id === req.params.id);
+  if (i < 0) return res.status(404).json({ error: 'Post not found.' });
+  db.posts.splice(i, 1); save(); res.json({ ok: true });
+});
+app.get('/api/admin/posts/:id/author', auth, adminOnly, (req, res) => {
+  const p = db.posts.find((x) => x.id === req.params.id);
+  if (!p) return res.status(404).json({ error: 'Post not found.' });
+  const u = db.users.find((x) => x.id === p.uid);
+  db.audit.push({ at: Date.now(), postId: p.id });
+  save(); res.json({ email: (u && u.email) || null });
 });
 
 app.get('/api/me', auth, (req, res) => res.json({ ok: true, admin: isAdmin(req.uid) }));
