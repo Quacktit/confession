@@ -67,3 +67,208 @@ a{color:var(--yellow);text-decoration:none}
 .review-actions{display:flex;gap:10px;margin-top:10px}
 .btn-reject{background:var(--charcoal-2);color:var(--text)}
 
+
+/* 1. VIBE FONTS: Edgy Display + Clean Body + Hacker Mono for Anonymity */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap');
+
+:root {
+  /* Core Dark-Mode Palette (Matte Black, Charcoal & Electric Yellow) */
+  --bg- !important: #0a0b0e;
+  --bg-main: #0a0b0e;
+  --bg-surface: #12141a;
+  --bg-elevated: #1a1d26;
+  --bg-glass: rgba(18, 20, 26, 0.85);
+  
+  /* Text Colors */
+  --text-main: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  
+  /* Accent & Status Colors */
+  --accent: #facc15;
+  --accent-hover: #eab308;
+  --accent-glow: rgba(250, 204, 21, 0.18);
+  --danger: #ef4444;
+  --success: #22c55e;
+  --border: #262936;
+  --border-hover: rgba(250, 204, 21, 0.45);
+
+  /* Common Variable Aliases (in case page CSS uses these names) */
+  --bg: var(--bg-main);
+  --card: var(--bg-surface);
+  --text: var(--text-main);
+  --muted: var(--text-secondary);
+  --primary: var(--accent);
+
+  /* Typography & Layout */
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+
+/* 2. GLOBAL RESET & BACKGROUND */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-main) !important;
+  background-image: radial-gradient(circle at 50% 0%, rgba(250, 204, 21, 0.06), transparent 45%) !important;
+  background-attachment: fixed;
+  color: var(--text-main) !important;
+  font-family: var(--font-body) !important;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 3. TYPOGRAPHY & VIBE */
+h1, h2, h3, h4, .logo, .brand, header strong {
+  font-family: var(--font-display) !important;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  margin-top: 0;
+}
+
+/* Anonymous IDs, Timestamps, Badges & Counters */
+small, time, .meta, .timestamp, .badge, .tag, .anon-id, code {
+  font-family: var(--font-mono) !important;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+/* 4. NAVIGATION / HEADER BAR */
+header, nav, .navbar, .topbar {
+  background: var(--bg-glass) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border) !important;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* 5. CARDS, CONFESSION POSTS & CONTAINERS */
+.card, .post, .confession, .confession-card, .post-card, .panel, .box, article, form.card {
+  background-color: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35) !important;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover, .post:hover, .confession-card:hover, .post-card:hover, article:hover {
+  border-color: var(--border-hover) !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 18px rgba(250, 204, 21, 0.06) !important;
+}
+
+/* 6. INPUTS, TEXTAREAS & SELECT DROPDOWNS */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select {
+  background-color: var(--bg-elevated) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body) !important;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-glow) !important;
+}
+
+/* 7. BUTTONS (Yellow Primary + Subtle Secondary + Red Danger) */
+button, .btn, input[type="submit"] {
+  font-family: var(--font-display) !important;
+  font-weight: 600 !important;
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
+  background-color: var(--accent) !important;
+  color: #0a0b0e !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 0.65rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+button:hover, .btn:hover, input[type="submit"]:hover {
+  background-color: var(--accent-hover) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(250, 204, 21, 0.25);
+}
+
+button:active, .btn:active {
+  transform: translateY(0);
+}
+
+/* Secondary / Ghost / Cancel / Filter Buttons */
+button.secondary, .btn-secondary, .btn-outline, .tab, .filter-btn {
+  background-color: var(--bg-elevated) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important;
+}
+
+button.secondary:hover, .btn-secondary:hover, .btn-outline:hover, .tab:hover {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+}
+
+/* Reject / Delete Buttons in Admin & My Confessions */
+button.danger, .btn-danger, .reject, .delete, button[data-action="reject"], button[data-action="delete"] {
+  background-color: rgba(239, 68, 68, 0.14) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.35) !important;
+}
+
+button.danger:hover, .btn-danger:hover, .reject:hover, .delete:hover {
+  background-color: var(--danger) !important;
+  color: #ffffff !important;
+}
+
+/* 8. CUSTOM DARK SCROLLBAR */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #262936;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
