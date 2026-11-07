@@ -10,8 +10,6 @@ const PORT = process.env.PORT || 3000;
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || '').toLowerCase(); // reviewer account
 const ALLOWED_DOMAIN = (process.env.ALLOWED_DOMAIN || '').toLowerCase(); // e.g. "adc.edu.in" (optional)
 const DB_FILE = path.join(__dirname, 'data', 'db.json');
-db.audit = db.audit || [];
-const VALID = ['approved', 'pending', 'private', 'rejected'];
 const SECRET_FILE = path.join(__dirname, 'data', 'secret.key');
 
 if (!fs.existsSync(path.dirname(DB_FILE))) fs.mkdirSync(path.dirname(DB_FILE), { recursive: true });
