@@ -95,6 +95,11 @@ app.get('/api/me', auth, (req, res) => res.json({ ok: true, admin: isAdmin(req.u
 // Public shape never includes author info.
 const pub = (p) => ({ id: p.id, text: p.text, createdAt: p.createdAt, views: p.views });
 
+app.get('/api/confessions/:id', auth, (req, res) => {
+  const p = db.posts.find((x) => x.id === req.params.id);
+  if (!p || (p.status !== 'approved' && p.uid !== req.uid)) return res.status(404).json({ error: 'Confession not found.' });
+  res.json(pub(p));
+});
 app.get('/api/confessions', auth, (req, res) => {
   const sort = req.query.sort || 'latest';
   const terms = String(req.query.q || '').toLowerCase().split(/\s+/).filter(Boolean);
