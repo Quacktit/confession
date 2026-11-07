@@ -119,3 +119,9 @@ select.search option:checked{background:var(--yellow);color:var(--ink)}
   select.search option:checked{background:var(--yellow);color:var(--ink)}
   select.search option::checkmark{display:none}
 }
+
+.pw-wrap{position:relative}
+.pw-wrap .field{padding-right:48px}
+.pw-toggle{position:absolute;top:50%;right:8px;transform:translateY(-50%);background:none;border:0;padding:6px;cursor:pointer;color:var(--grey);display:flex;line-height:0}
+.pw-toggle:hover{color:var(--yellow)}
+.pw-toggle svg{width:20px;height:20px}
