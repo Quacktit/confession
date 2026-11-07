@@ -101,4 +101,21 @@ h2{font-size:26px;font-weight:500}
 .review-actions{flex-wrap:wrap}
 .review-actions .btn{padding:6px 14px;font-size:14px}
 main h2.section-title{margin-top:40px;color:var(--yellow)}
-#status-filter{margin-bottom:16px}
+
+.admin-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.admin-toolbar .btn{padding:8px 18px;font-size:14px;border-radius:999px}
+
+select.search{appearance:none;-webkit-appearance:none;padding-right:38px;background-color:var(--charcoal);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23f5c518' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;cursor:pointer}
+select.search option{background:var(--charcoal);color:var(--text)}
+select.search option:checked{background:var(--yellow);color:var(--ink)}
+
+@supports (appearance:base-select){
+  select.search,select.search::picker(select){appearance:base-select}
+  select.search{background-image:none;padding-right:16px}
+  select.search::picker-icon{color:var(--yellow)}
+  select.search::picker(select){background:var(--charcoal);border:1px solid var(--yellow);border-radius:12px;padding:6px;margin-top:6px}
+  select.search option{padding:8px 14px;border-radius:8px}
+  select.search option:hover{background:var(--charcoal-2);color:var(--yellow)}
+  select.search option:checked{background:var(--yellow);color:var(--ink)}
+  select.search option::checkmark{display:none}
+}
