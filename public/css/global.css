@@ -33,7 +33,7 @@ a{color:var(--yellow);text-decoration:none}
 #feed .card{background:var(--charcoal);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;cursor:pointer}
 #feed .card:hover{border-color:var(--yellow)}
 #feed .card-text{margin:0 0 10px;white-space:pre-wrap;word-break:break-word;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
-#feed .card.open #feed .card-text{display:block;-webkit-line-clamp:unset}
+#feed .card.open .card-text{display:block;-webkit-line-clamp:unset}
 #feed .card-meta{color:var(--grey);font-size:.8rem}
 
 /* ---- my-confessions ---- */
