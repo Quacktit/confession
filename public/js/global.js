@@ -123,15 +123,15 @@ async function initMyConfessions() {
     function postCard(post) {
     const c = el('article', 'card');
     const top = el('div', 'card-top');
-    const label = post.status === 'pending' ? 'IN REVIEW' : post.status === 'rejected' ? 'NOT PUBLISHED' : '';
-    top.append(label ? el('span', 'badge', label) : el('span'));
+    const label = post.status === 'pending' ? 'IN REVIEW' : post.status === 'rejected' ? 'NOT PUBLISHED' : post.status === 'private' ? 'HIDDEN' : '';    top.append(label ? el('span', 'badge', label) : el('span'));
     const editBtn = el('button', 'btn btn-sm', 'Edit'); editBtn.type = 'button';
-    top.append(editBtn);
+    if (post.status !== 'private') top.append(editBtn);
     const text = el('p', 'card-text', post.text);
     c.append(top, text, el('div', 'card-meta', formatDate(post.createdAt)));
     if (post.status === 'pending') c.append(el('p', 'review-note', 'This post is being reviewed before it is published.'));
     if (post.status === 'rejected') c.append(el('p', 'review-note', 'This post was not published. Edit it and it will be reviewed again.'));
-    editBtn.addEventListener('click', () => { editBtn.hidden = true; startEdit(text, post); });
+    if (post.status === 'private') c.append(el('p', 'review-note', 'This post was hidden by the site reviewer.'));
+      editBtn.addEventListener('click', () => { editBtn.hidden = true; startEdit(text, post); });
     return c;
   }
   
