@@ -68,47 +68,46 @@ a{color:var(--yellow);text-decoration:none}
 .btn-reject{background:var(--charcoal-2);color:var(--text)}
 
 
-/* 1. VIBE FONTS: Edgy Display + Clean Body + Hacker Mono for Anonymity */
+/* ==========================================
+   UNSPOKENADC GLOBAL VIBE THEME (NO BACKLIGHT)
+   Palette: Flat Graphite-Charcoal & Amber-Yellow
+   ========================================== */
+
+/* 1. TYPOGRAPHY (Space Grotesk + Plus Jakarta Sans + JetBrains Mono) */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap');
 
 :root {
-  /* Core Dark-Mode Palette (Matte Black, Charcoal & Electric Yellow) */
-  --bg- !important: #0a0b0e;
-  --bg-main: #0a0b0e;
-  --bg-surface: #12141a;
-  --bg-elevated: #1a1d26;
-  --bg-glass: rgba(18, 20, 26, 0.85);
+  /* Surface Layers (Flat Matte Charcoal Shades) */
+  --bg-page: #1c1d21 !important;        /* Matte Graphite */
+  --bg-card: #25272c !important;        /* Elevated Charcoal */
+  --bg-input: #18191c !important;       /* Recessed Slate */
+  --border-subtle: #353840 !important;  /* Muted Gunmetal */
   
-  /* Text Colors */
-  --text-main: #f3f4f6;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
+  /* Accent & Typographical Color Systems */
+  --accent-primary: #f5b700 !important; /* Warm Amber Gold */
+  --accent-hover: #ffd147 !important;   /* Luminous Marigold */
+  --danger: #ef4444 !important;          /* Moderation/Rejection red */
   
-  /* Accent & Status Colors */
-  --accent: #facc15;
-  --accent-hover: #eab308;
-  --accent-glow: rgba(250, 204, 21, 0.18);
-  --danger: #ef4444;
-  --success: #22c55e;
-  --border: #262936;
-  --border-hover: rgba(250, 204, 21, 0.45);
+  /* Support Banner Accents (Calm Sky Blue & Slate Tint) */
+  --support-blue: #38bdf8 !important;
+  --support-tint: #1e293b !important;
 
-  /* Common Variable Aliases (in case page CSS uses these names) */
-  --bg: var(--bg-main);
-  --card: var(--bg-surface);
+  /* Typography Colors */
+  --text-main: #f3f4f6 !important;      /* Soft Chalk White */
+  --text-secondary: #9ca3af !important; /* Cool Pewter */
+  --text-placeholder: #6b7280 !important;
+
+  /* Common Aliases for overrides */
+  --bg: var(--bg-page);
+  --card: var(--bg-card);
   --text: var(--text-main);
   --muted: var(--text-secondary);
-  --primary: var(--accent);
-
-  /* Typography & Layout */
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --radius: 14px;
+  --primary: var(--accent-primary);
+  --radius: 12px;
   --radius-sm: 8px;
 }
 
-/* 2. GLOBAL RESET & BACKGROUND */
+/* 2. GLOBAL RESET & BASE STYLING (Strict Flat Matte Background) */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -116,35 +115,39 @@ a{color:var(--yellow);text-decoration:none}
 html, body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-main) !important;
-  background-image: radial-gradient(circle at 50% 0%, rgba(250, 204, 21, 0.06), transparent 45%) !important;
-  background-attachment: fixed;
+  background-color: var(--bg-page) !important;
+  background-image: none !important; /* Removes top ambient backlight */
   color: var(--text-main) !important;
-  font-family: var(--font-body) !important;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
 
-/* 3. TYPOGRAPHY & VIBE */
+/* 3. HEADERS, LOGOS & TYPOGRAPHY */
 h1, h2, h3, h4, .logo, .brand, header strong {
-  font-family: var(--font-display) !important;
+  font-family: 'Space Grotesk', sans-serif !important;
   letter-spacing: -0.025em;
-  color: #ffffff;
+  color: var(--text-main) !important;
   margin-top: 0;
 }
 
-/* Anonymous IDs, Timestamps, Badges & Counters */
+/* Accent coloring for "adc" in unspokenadc */
+.logo span, .brand span, .brand-text span {
+  color: var(--accent-primary) !important;
+}
+
+/* Meta Labels: Anonymous IDs, Timestamps, Badges */
 small, time, .meta, .timestamp, .badge, .tag, .anon-id, code {
-  font-family: var(--font-mono) !important;
+  font-family: 'JetBrains Mono', monospace !important;
   font-size: 0.8rem;
-  color: var(--text-secondary);
+  color: var(--text-secondary) !important;
   letter-spacing: -0.01em;
 }
 
 a {
-  color: var(--accent);
+  color: var(--accent-primary);
   text-decoration: none;
-  transition: color 0.15s ease, opacity 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 a:hover {
@@ -152,101 +155,124 @@ a:hover {
   text-decoration: underline;
 }
 
-/* 4. NAVIGATION / HEADER BAR */
+/* 4. NAVIGATION BAR (Solid Elevated Charcoal, No Blur Glow) */
 header, nav, .navbar, .topbar {
-  background: var(--bg-glass) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border) !important;
+  background: var(--bg-card) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  box-shadow: none !important;
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
-/* 5. CARDS, CONFESSION POSTS & CONTAINERS */
+/* 5. CARDS, CONFESSION POSTS & CONTAINERS (Crisp Borders, Zero Glow) */
 .card, .post, .confession, .confession-card, .post-card, .panel, .box, article, form.card {
-  background-color: var(--bg-surface) !important;
-  border: 1px solid var(--border) !important;
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-subtle) !important;
   border-radius: var(--radius) !important;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35) !important;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: none !important; /* No outer glow or heavy shadow */
+  transition: border-color 0.15s ease, transform 0.15s ease;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .card:hover, .post:hover, .confession-card:hover, .post-card:hover, article:hover {
-  border-color: var(--border-hover) !important;
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 18px rgba(250, 204, 21, 0.06) !important;
+  border-color: var(--accent-primary) !important;
+  box-shadow: none !important;
 }
 
-/* 6. INPUTS, TEXTAREAS & SELECT DROPDOWNS */
+/* 6. INPUTS & TEXTAREAS (Recessed Slate Layer, Crisp Focus Border) */
 input:not([type="checkbox"]):not([type="radio"]),
 textarea,
 select {
-  background-color: var(--bg-elevated) !important;
+  background-color: var(--bg-input) !important;
   color: var(--text-main) !important;
-  border: 1px solid var(--border) !important;
+  border: 1px solid var(--border-subtle) !important;
   border-radius: var(--radius-sm) !important;
   padding: 0.75rem 1rem;
-  font-family: var(--font-body) !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-size: 0.95rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease;
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: var(--text-muted) !important;
+  color: var(--text-placeholder) !important;
 }
 
+/* Clean solid yellow border on focus without outer halo glow */
 input:focus,
 textarea:focus,
 select:focus {
   outline: none !important;
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px var(--accent-glow) !important;
+  border-color: var(--accent-primary) !important;
+  box-shadow: none !important;
 }
 
-/* 7. BUTTONS (Yellow Primary + Subtle Secondary + Red Danger) */
-button, .btn, input[type="submit"] {
-  font-family: var(--font-display) !important;
+/* 7. BUTTONS (Dark Charcoal Text on Warm Amber Gold, No Hover Glow) */
+button, .btn, input[type="submit"], button[type="submit"] {
+  font-family: 'Space Grotesk', sans-serif !important;
   font-weight: 600 !important;
   font-size: 0.92rem;
   letter-spacing: 0.01em;
-  background-color: var(--accent) !important;
-  color: #0a0b0e !important;
+  background-color: var(--accent-primary) !important;
+  color: var(--bg-input) !important; /* Dark Charcoal Text (#18191C) */
   border: 1px solid transparent !important;
   border-radius: var(--radius-sm) !important;
   padding: 0.65rem 1.25rem;
   cursor: pointer;
-  transition: all 0.16s ease;
+  box-shadow: none !important;
+  transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
-button:hover, .btn:hover, input[type="submit"]:hover {
+button:hover, .btn:hover, input[type="submit"]:hover, button[type="submit"]:hover {
   background-color: var(--accent-hover) !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(250, 204, 21, 0.25);
+  box-shadow: none !important;
 }
 
 button:active, .btn:active {
-  transform: translateY(0);
+  transform: translateY(1px);
 }
 
-/* Secondary / Ghost / Cancel / Filter Buttons */
+/* Secondary / Cancel Buttons */
 button.secondary, .btn-secondary, .btn-outline, .tab, .filter-btn {
-  background-color: var(--bg-elevated) !important;
+  background-color: var(--bg-input) !important;
   color: var(--text-main) !important;
-  border: 1px solid var(--border) !important;
+  border: 1px solid var(--border-subtle) !important;
   box-shadow: none !important;
 }
 
 button.secondary:hover, .btn-secondary:hover, .btn-outline:hover, .tab:hover {
-  border-color: var(--accent) !important;
-  color: var(--accent) !important;
+  border-color: var(--accent-primary) !important;
+  color: var(--accent-primary) !important;
+  background-color: var(--bg-card) !important;
 }
 
-/* Reject / Delete Buttons in Admin & My Confessions */
+/* Urgent / Resources Banner (Tele-MANAS 14416 / 112) */
+.support-banner, .resources-card, .banner-alert {
+  background-color: var(--support-tint) !important;
+  border: 1px solid var(--support-blue) !important;
+  color: var(--text-main) !important;
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: none !important;
+}
+
+.support-banner a, .resources-card a {
+  color: var(--support-blue) !important;
+  font-weight: 600;
+}
+
+/* Danger/Moderate/Reject Actions */
 button.danger, .btn-danger, .reject, .delete, button[data-action="reject"], button[data-action="delete"] {
   background-color: rgba(239, 68, 68, 0.14) !important;
   color: #f87171 !important;
   border: 1px solid rgba(239, 68, 68, 0.35) !important;
+  box-shadow: none !important;
 }
 
 button.danger:hover, .btn-danger:hover, .reject:hover, .delete:hover {
@@ -254,21 +280,21 @@ button.danger:hover, .btn-danger:hover, .reject:hover, .delete:hover {
   color: #ffffff !important;
 }
 
-/* 8. CUSTOM DARK SCROLLBAR */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-main);
+  background: var(--bg-page);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #262936;
+  background: var(--border-subtle);
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
+  background: var(--accent-primary);
 }
