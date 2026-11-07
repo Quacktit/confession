@@ -157,8 +157,22 @@ async function initAdmin() {
   empty();
 }
 
+async function initConfession() {
+  await requireAuth();
+  bindLogout();
+  const id = new URLSearchParams(window.location.search).get('id');
+  const text = document.getElementById('read-text');
+  const meta = document.getElementById('read-meta');
+  try {
+    const post = await api('/api/confessions/' + encodeURIComponent(id));
+    text.textContent = post.text;
+    meta.textContent = formatDate(post.createdAt);
+    api('/api/confessions/' + post.id + '/view', { method: 'POST' }).catch(() => {});
+  } catch (e) { text.textContent = e.message; }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  const pages = { confessions: initConfessions, 'my-confessions': initMyConfessions, privacy: initPrivacy, login: initAuth, admin: initAdmin };
+ const pages = { confessions: initConfessions, confession: initConfession, 'my-confessions': initMyConfessions, privacy: initPrivacy, login: initAuth, admin: initAdmin };
   const init = pages[document.body.dataset.page];
   if (init) init();
 });
