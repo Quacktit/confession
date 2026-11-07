@@ -176,11 +176,16 @@ function initAuth() {
   });
 }
 
+async function adminApi(url, options = {}) {
+  return api(url, { ...options, headers: { 'Content-Type': 'application/json', 'x-admin-key': sessionStorage.getItem('adminKey') || '' } });
+}
+
 async function initAdmin() {
-  await requireAuth();
   bindLogout();
-  const me = await api('/api/me');
-  if (!me.admin) { window.location.href = '/confessions.html'; return; }
+  const gate = document.getElementById('gate');
+  const gateForm = document.getElementById('gate-form');
+  const gateMsg = document.getElementById('gate-msg');
+  const panel = document.getElementById('panel');
   const queue = document.getElementById('queue');
   const all = document.getElementById('all-posts');
   const filter = document.getElementById('status-filter');
@@ -203,8 +208,8 @@ async function initAdmin() {
     const c = el('article', 'review-card');
     const ta = el('textarea', 'review-text'); ta.value = post.text;
     const row = el('div', 'review-actions');
-    btn(row, 'Approve & publish', 'btn', () => run(() => api('/api/admin/posts/' + post.id, { method: 'PUT', body: JSON.stringify({ action: 'approve', text: ta.value }) })));
-    btn(row, 'Reject', 'btn btn-reject', () => run(() => api('/api/admin/posts/' + post.id, { method: 'PUT', body: JSON.stringify({ action: 'reject' }) })));
+    btn(row, 'Approve & publish', 'btn', () => run(() => adminApi('/api/admin/posts/' + post.id, { method: 'PUT', body: JSON.stringify({ action: 'approve', text: ta.value }) })));
+    btn(row, 'Reject', 'btn btn-reject', () => run(() => adminApi('/api/admin/posts/' + post.id, { method: 'PUT', body: JSON.stringify({ action: 'reject' }) })));
     c.append(el('div', 'muted', formatDate(post.createdAt)), ta, row);
     return c;
   }
@@ -216,16 +221,20 @@ async function initAdmin() {
     const ta = el('textarea', 'review-text'); ta.value = post.text;
     const row = el('div', 'review-actions');
     const info = el('p', 'review-note');
-    const update = (body) => run(() => api('/api/admin/posts/' + post.id + '/update', { method: 'PUT', body: JSON.stringify(body) }));
+    const update = (body) => run(() => adminApi('/api/admin/posts/' + post.id + '/update', { method: 'PUT', body: JSON.stringify(body) }));
+    const sel = el('select', 'search');
+    [['approved', 'Published'], ['pending', 'In review'], ['private', 'Private'], ['rejected', 'Rejected']].forEach(([v, t]) => {
+      const o = el('option', '', t); o.value = v; if (v === post.status) o.selected = true; sel.append(o);
+    });
+    sel.addEventListener('change', () => update({ text: ta.value, status: sel.value }));
+    row.append(sel);
     btn(row, 'Save text', 'btn', () => update({ text: ta.value }));
-    if (post.status === 'approved') btn(row, 'Make private', 'btn btn-reject', () => update({ status: 'private' }));
-    else btn(row, 'Publish', 'btn', () => update({ text: ta.value, status: 'approved' }));
-    btn(row, 'Delete', 'btn btn-reject', () => { if (confirm('Delete this post permanently?')) run(() => api('/api/admin/posts/' + post.id, { method: 'DELETE' })); });
+    btn(row, 'Delete', 'btn btn-reject', () => { if (confirm('Delete this post permanently?')) run(() => adminApi('/api/admin/posts/' + post.id, { method: 'DELETE' })); });
     btn(row, 'Reveal author', 'btn btn-reject', async () => {
       if (!confirm('Reveal the author email for this post? This action is logged.')) return;
       try {
-        const r = await api('/api/admin/posts/' + post.id + '/author');
-        info.textContent = r.email ? 'Author: ' + r.email : 'Email not available yet for this account (saved at their next login).';
+        const r = await adminApi('/api/admin/posts/' + post.id + '/author');
+        info.textContent = r.email ? 'Author: ' + r.email : 'Email not available for this account.';
       } catch (e) { alert(e.message); }
     });
     c.append(head, ta, row, info);
@@ -233,24 +242,36 @@ async function initAdmin() {
   }
 
   async function refresh() {
+    const pending = await adminApi('/api/admin/pending');
+    const s = filter.value;
+    const posts = await adminApi('/api/admin/posts' + (s ? '?status=' + s : ''));
+    posts.sort((a, b) => newest ? b.createdAt - a.createdAt : a.createdAt - b.createdAt);
     queue.replaceChildren(); all.replaceChildren();
-    const pending = await api('/api/admin/pending');
     pending.forEach((p) => queue.append(queueCard(p)));
     if (!pending.length) queue.append(el('p', 'muted', 'No posts waiting for review.'));
-    const s = filter.value;
-    const posts = await api('/api/admin/posts' + (s ? '?status=' + s : ''));
-    posts.sort((a, b) => newest ? b.createdAt - a.createdAt : a.createdAt - b.createdAt);
     posts.forEach((p) => all.append(allCard(p)));
     if (!posts.length) all.append(el('p', 'muted', 'No posts here.'));
   }
-  filter.addEventListener('change', refresh);
-    sortBtn.addEventListener('click', () => {
+
+  async function unlock(key) {
+    sessionStorage.setItem('adminKey', key);
+    try { await refresh(); gate.hidden = true; panel.hidden = false; }
+    catch (e) { sessionStorage.removeItem('adminKey'); gateMsg.textContent = e.message; }
+  }
+
+  filter.addEventListener('change', () => run(async () => {}));
+  sortBtn.addEventListener('click', () => {
     newest = !newest;
     sortBtn.textContent = newest ? 'Newest first ↓' : 'Oldest first ↑';
-    refresh();
+    run(async () => {});
   });
-  await refresh();
+  gateForm.addEventListener('submit', (e) => {
+    e.preventDefault(); gateMsg.textContent = '';
+    unlock(gateForm.key.value); gateForm.key.value = '';
+  });
+  if (sessionStorage.getItem('adminKey')) unlock(sessionStorage.getItem('adminKey'));
 }
+
 async function initConfession() {
   await requireAuth();
   bindLogout();
