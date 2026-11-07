@@ -184,6 +184,8 @@ async function initAdmin() {
   const queue = document.getElementById('queue');
   const all = document.getElementById('all-posts');
   const filter = document.getElementById('status-filter');
+  const sortBtn = document.getElementById('sort-btn');
+  let newest = true;
 
   function el(tag, cls, text) {
     const e = document.createElement(tag);
@@ -237,10 +239,16 @@ async function initAdmin() {
     if (!pending.length) queue.append(el('p', 'muted', 'No posts waiting for review.'));
     const s = filter.value;
     const posts = await api('/api/admin/posts' + (s ? '?status=' + s : ''));
+    posts.sort((a, b) => newest ? b.createdAt - a.createdAt : a.createdAt - b.createdAt);
     posts.forEach((p) => all.append(allCard(p)));
     if (!posts.length) all.append(el('p', 'muted', 'No posts here.'));
   }
   filter.addEventListener('change', refresh);
+    sortBtn.addEventListener('click', () => {
+    newest = !newest;
+    sortBtn.textContent = newest ? 'Newest first ↓' : 'Oldest first ↑';
+    refresh();
+  });
   await refresh();
 }
 async function initConfession() {
