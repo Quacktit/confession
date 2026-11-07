@@ -1,286 +1,90 @@
-/* ---- base ---- */
-:root{--black:#0b0b0c;--charcoal:#1c1d20;--charcoal-2:#26272b;--grey:#8a8d93;--text:#e8e8ea;--yellow:#f5c518;--radius:12px}
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Caveat:wght@500&family=Hind:wght@400;500&display=swap');
+
+:root{--black:#0b0b0c;--charcoal:#1c1d20;--charcoal-2:#26272b;--grey:#8a8d93;--text:#e8e8ea;--yellow:#f5c518;--ink:#1E1E1E;--radius:12px;--font-heading:'Fraunces',serif;--font-body:'Inter','Hind',sans-serif;--font-accent:'Caveat',cursive}
 *{box-sizing:border-box}
-body{margin:0;background:var(--black);color:var(--text);font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;line-height:1.6;min-height:100vh}
+body{margin:0;background:var(--black);color:var(--text);font-family:var(--font-body);font-size:17px;font-weight:400;line-height:1.65;min-height:100vh}
 a{color:var(--yellow);text-decoration:none}
+strong{font-weight:600}
+
+/* typography */
+h1,h2,h3,.brand,.prompt,.page-title{font-family:var(--font-heading);font-weight:600;line-height:1.2;letter-spacing:-0.01em}
+h1,.prompt,.page-title{font-size:38px;margin:0 0 16px;color:var(--yellow)}
+h2{font-size:26px;font-weight:500}
+.muted,.card-meta,.site-footer{font-size:14px}
+.muted{color:var(--grey)}
+.accent{display:block;font-family:var(--font-accent);font-weight:500;font-size:21px;line-height:1.2;color:var(--yellow);margin:0 0 4px}
+
+/* header */
 .site-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:16px 24px;background:var(--charcoal);border-bottom:2px solid var(--yellow);position:sticky;top:0;z-index:5}
-.brand{font-weight:800;font-size:1.3rem;letter-spacing:.5px;color:var(--text)}
+.brand{font-size:24px;color:var(--text)}
 .brand span{color:var(--yellow)}
 .site-nav{display:flex;gap:18px;align-items:center}
-.site-nav a,.site-nav button{color:var(--grey);background:none;border:0;font:inherit;cursor:pointer;padding:4px 0;border-bottom:2px solid transparent}
+.site-nav a,.site-nav button{color:var(--grey);background:none;border:0;font:inherit;font-size:16px;font-weight:500;cursor:pointer;padding:4px 0;border-bottom:2px solid transparent}
 .site-nav a:hover,.site-nav button:hover,.site-nav a.active{color:var(--yellow);border-bottom-color:var(--yellow)}
+
+/* layout + buttons */
 .container{max-width:820px;margin:0 auto;padding:32px 20px 64px}
-.btn{background:var(--yellow);color:var(--black);border:0;border-radius:var(--radius);padding:12px 24px;font:inherit;font-weight:700;cursor:pointer}
+.btn{background:var(--yellow);color:var(--ink);border:0;border-radius:var(--radius);padding:12px 24px;font-family:var(--font-body);font-size:16px;font-weight:600;cursor:pointer}
 .btn:hover{filter:brightness(1.1)}
 .btn:disabled{opacity:.5;cursor:not-allowed}
-.muted{color:var(--grey);font-size:.9rem}
-.site-footer{text-align:center;padding:24px;color:var(--grey);font-size:.85rem;border-top:1px solid var(--charcoal-2)}
+.site-footer{text-align:center;padding:24px;color:var(--grey);border-top:1px solid var(--charcoal-2)}
+.badge{display:inline-block;background:var(--yellow);color:var(--ink);font-size:12px;font-weight:600;border-radius:6px;padding:2px 8px;margin-bottom:8px}
 
-/* ---- confessions ---- */
-.prompt{font-size:1.8rem;margin:0 0 16px;color:var(--yellow)}
-.write-box{width:100%;min-height:220px;resize:vertical;background:var(--charcoal);color:var(--text);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:16px;font:inherit}
+/* confessions page */
+.write-box{width:100%;min-height:220px;resize:vertical;background:var(--charcoal);color:var(--text);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:16px;font-family:var(--font-body);font-size:17px;line-height:1.65}
+.write-box::placeholder{color:var(--grey)}
 .write-box:focus{outline:2px solid var(--yellow)}
 .write-actions{display:flex;justify-content:space-between;align-items:center;margin:12px 0 20px}
-.helpline{background:var(--charcoal);border-left:4px solid var(--yellow);border-radius:var(--radius);padding:16px 20px;margin-bottom:40px}
-.helpline h2{margin:0 0 6px;font-size:1rem;color:var(--yellow)}
-.helpline p{margin:4px 0;color:var(--grey)}
+.helpline{background:var(--charcoal);border-left:4px solid var(--yellow);border-radius:var(--radius);padding:14px 18px;margin-bottom:36px}
+.helpline h2{margin:0 0 6px;font-size:20px;font-weight:600;color:var(--yellow)}
+.helpline p{margin:3px 0;color:var(--grey);font-size:15px;line-height:1.5}
 .helpline strong{color:var(--text)}
 .feed-bar{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;margin-bottom:20px}
 .tabs{display:flex;gap:8px}
-.tab{background:var(--charcoal);color:var(--grey);border:1px solid var(--charcoal-2);border-radius:999px;padding:6px 16px;font:inherit;cursor:pointer}
-.tab.active{background:var(--yellow);color:var(--black);border-color:var(--yellow);font-weight:700}
-.search{background:var(--charcoal);color:var(--text);border:1px solid var(--charcoal-2);border-radius:999px;padding:8px 16px;font:inherit}
+.tab{background:var(--charcoal);color:var(--grey);border:1px solid var(--charcoal-2);border-radius:999px;padding:6px 16px;font-family:var(--font-body);font-size:15px;font-weight:500;cursor:pointer}
+.tab.active{background:var(--yellow);color:var(--ink);border-color:var(--yellow);font-weight:600}
+.search{background:var(--charcoal);color:var(--text);border:1px solid var(--charcoal-2);border-radius:999px;padding:8px 16px;font-family:var(--font-body);font-size:16px}
+.search:focus{outline:2px solid var(--yellow)}
 #feed .card{background:var(--charcoal);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;cursor:pointer}
 #feed .card:hover{border-color:var(--yellow)}
 #feed .card-text{margin:0 0 10px;white-space:pre-wrap;word-break:break-word;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
-#feed .card.open .card-text{display:block;-webkit-line-clamp:unset}
-#feed .card-meta{color:var(--grey);font-size:.8rem}
+.card-meta{color:var(--grey)}
 
-/* ---- my-confessions ---- */
-.page-title{font-size:2rem;margin:0 0 12px;color:var(--yellow)}
+/* my confessions */
 #my-list .card{background:var(--charcoal);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px}
 #my-list .card.draft{border:1px dashed var(--yellow)}
-.badge{display:inline-block;background:var(--yellow);color:var(--black);font-size:.7rem;font-weight:800;border-radius:6px;padding:2px 8px;margin-bottom:8px}
 #my-list .card-text{margin:0 0 10px;white-space:pre-wrap;word-break:break-word}
-#my-list .card-meta{color:var(--grey);font-size:.8rem}
 .empty{color:var(--grey)}
 
-/* ---- privacy ---- */
-.policy h2{color:var(--yellow);margin-top:28px;font-size:1.15rem}
+/* privacy */
+.policy h2{color:var(--yellow);margin-top:28px}
 .policy ul{padding-left:20px}
 
-/* ---- auth ---- */
+/* login */
 .auth-wrap{max-width:420px;margin:8vh auto;padding:0 20px}
 .auth-card{background:var(--charcoal);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:28px}
-.auth-card h1{margin:0 0 4px;color:var(--yellow)}
-.field{display:block;width:100%;background:var(--black);color:var(--text);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:12px;margin:12px 0;font:inherit}
+.auth-card h1{font-size:29px;margin:0 0 4px}
+.field{display:block;width:100%;background:var(--black);color:var(--text);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:12px;margin:12px 0;font-family:var(--font-body);font-size:16px}
 .field:focus{outline:2px solid var(--yellow)}
 .auth-card .btn{width:100%;margin-top:8px}
 .switch{margin-top:16px;text-align:center}
-.switch button{background:none;border:0;color:var(--yellow);font:inherit;cursor:pointer}
+.switch button{background:none;border:0;color:var(--yellow);font:inherit;font-weight:500;cursor:pointer}
 .error{color:#ff6b6b;min-height:1.4em;margin:8px 0 0}
 
-/* ---- admin ---- */
+/* admin */
 .review-card{background:var(--charcoal);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px}
-.review-text{width:100%;min-height:140px;resize:vertical;background:var(--black);color:var(--text);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:12px;font:inherit}
+.review-text{width:100%;min-height:140px;resize:vertical;background:var(--black);color:var(--text);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:12px;font-family:var(--font-body);font-size:17px;line-height:1.65}
 .review-text:focus{outline:2px solid var(--yellow)}
 .review-actions{display:flex;gap:10px;margin-top:10px}
 .btn-reject{background:var(--charcoal-2);color:var(--text)}
 
-
-/* ==========================================
-   UNSPOKENADC STRICT DESIGN SYSTEM
-   ========================================== */
-
-/* 1. TYPOGRAPHY IMPORTS */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Caveat:wght@500&family=Hind:wght@400;500&display=swap');
-/* 2. EXACT COLOR PALETTE & VARIABLES */
-:root{--black:#0b0b0c;--charcoal:#1c1d20;--charcoal-2:#26272b;--grey:#8a8d93;--text:#e8e8ea;--yellow:#f5c518;--ink:#1E1E1E;--radius:12px;--font-heading:'Fraunces',serif;--font-body:'Inter','Hind',sans-serif;--font-accent:'Caveat',cursive}
-
-/* 3. GLOBAL RESET & BASE STYLING */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-html, body{margin:0;background:var(--black);color:var(--text);font-family:var(--font-body);font-size:17px;font-weight:400;line-height:1.65;min-height:100vh}
-
-
-/* 4. HEADERS, LOGOS & TYPOGRAPHY */
-h1, h2, h3, h4, .logo, .brand, header strong {
-  font-family: var(--font-display) !important;
-  letter-spacing: -0.025em;
-  color: var(--text-main);
-  margin-top: 0;
-}
-
-/* Header Logo Rule: "unspoken" in main text, "adc" in primary accent */
-.logo, .brand, .logo-text, .brand-text {
-  color: var(--text-main) !important;
-}
-
-.logo span, .brand span, .brand-text span {
-  color: var(--accent-primary) !important;
-}
-
-/* Secondary Text, Timestamps & IDs */
-small, time, .meta, .timestamp, .badge, .tag, .anon-id, code {
-  font-family: var(--font-mono) !important;
-  font-size: 0.8rem;
-  color: var(--text-secondary) !important;
-  letter-spacing: -0.01em;
-}
-
-a {
-  color: var(--accent-primary);
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-
-a:hover {
-  color: var(--accent-hover);
-  text-decoration: underline;
-}
-
-/* 5. NAVIGATION BAR */
-header, nav, .navbar, .topbar {
-  background-color: var(--bg-card) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border-bottom: 1px solid var(--border-color) !important;
-  box-shadow: none !important;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-/* 6. CONFESSION CARDS & THREAD CONTAINERS */
-.card, .post, .confession, .confession-card, .post-card, .panel, .box, article, form.card {
-  background-color: var(--bg-card) !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: var(--radius) !important;
-  box-shadow: none !important;
-  padding: 1.5rem;
-  margin-bottom: 1.25rem;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.card:hover, .post:hover, .confession-card:hover, .post-card:hover, article:hover {
-  background-color: var(--bg-card-hover) !important;
-  border-color: var(--accent-primary) !important;
-}
-
-/* 7. TEXTAREAS & INPUT FIELDS (Recessed Slate look) */
-input:not([type="checkbox"]):not([type="radio"]),
-textarea,
-select {
-  background-color: var(--bg-input) !important;
-  color: var(--text-main) !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: var(--radius-sm) !important;
-  padding: 0.75rem 1rem;
-  font-family: var(--font-body) !important;
-  font-size: 0.95rem;
-  box-shadow: none !important;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: var(--text-placeholder) !important;
-}
-
-/* Input Focus Glow Rule */
-input:focus,
-textarea:focus,
-select:focus {
-  outline: none !important;
-  border-color: var(--accent-primary) !important;
-  box-shadow: 0 0 0 3px rgba(245, 183, 0, 0.15) !important;
-}
-
-/* 8. PRIMARY BUTTONS RULE */
-button, .btn, input[type="submit"], button[type="submit"] {
-  font-family: var(--font-display) !important;
-  font-weight: 600 !important;
-  font-size: 0.92rem;
-  letter-spacing: 0.01em;
-  background-color: var(--accent-primary) !important;
-  color: var(--accent-text) !important; /* #18191C Dark Charcoal */
-  border: 1px solid transparent !important;
-  border-radius: var(--radius-sm) !important;
-  padding: 0.65rem 1.25rem;
-  cursor: pointer;
-  box-shadow: none !important;
-  transition: background-color 0.15s ease, transform 0.1s ease;
-}
-
-button:hover, .btn:hover, input[type="submit"]:hover, button[type="submit"]:hover {
-  background-color: var(--accent-hover) !important; /* #FFD147 */
-  box-shadow: none !important;
-}
-
-button:active, .btn:active {
-  transform: translateY(1px);
-}
-
-/* Secondary / Cancel Buttons */
-button.secondary, .btn-secondary, .btn-outline, .tab, .filter-btn {
-  background-color: var(--bg-input) !important;
-  color: var(--text-main) !important;
-  border: 1px solid var(--border-color) !important;
-  box-shadow: none !important;
-}
-
-button.secondary:hover, .btn-secondary:hover, .btn-outline:hover, .tab:hover {
-  border-color: var(--accent-primary) !important;
-  color: var(--accent-primary) !important;
-  background-color: var(--bg-card) !important;
-}
-
-/* 9. TELE-MANAS SUPPORT BANNER RULE */
-.support-banner, .resources-card, .banner-alert {
-  background-color: var(--support-bg) !important;
-  border: 1px solid var(--support-border) !important;
-  color: var(--text-main) !important;
-  border-radius: var(--radius);
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
-  box-shadow: none !important;
-}
-
-.support-banner a, .resources-card a, .support-banner strong, .resources-card strong {
-  color: var(--support-highlight) !important;
-}
-
-/* 10. DANGER / MODERATION ACTIONS */
-button.danger, .btn-danger, .reject, .delete, button[data-action="reject"], button[data-action="delete"] {
-  background-color: rgba(239, 68, 68, 0.14) !important;
-  color: #f87171 !important;
-  border: 1px solid rgba(239, 68, 68, 0.35) !important;
-  box-shadow: none !important;
-}
-
-button.danger:hover, .btn-danger:hover, .reject:hover, .delete:hover {
-  background-color: #ef4444 !important;
-  color: #ffffff !important;
-}
-
-/* 11. SCROLLBAR */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-page);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 999px;
-}
+/* reader page */
 .back-link{display:inline-block;margin-bottom:20px}
 .read-card{background:var(--charcoal);border:1px solid var(--charcoal-2);border-radius:var(--radius);padding:28px}
-.read-text{white-space:pre-wrap;word-break:break-word;font-size:1.1rem;margin:0 0 16px}
+.read-text{white-space:pre-wrap;word-break:break-word;font-size:17px;margin:0 0 16px}
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-primary);
-}
-
-/* ---- typography system ---- */
-h1,h2,h3,.brand,.prompt,.page-title{font-family:var(--font-heading);font-weight:600;line-height:1.2;letter-spacing:-0.01em}
-.brand{font-size:24px}
-h1,.prompt,.page-title{font-size:38px}
-h2,.helpline h2,.policy h2{font-size:26px;font-weight:500}
-.muted,.card-meta,.site-footer,.badge{font-size:14px}
-.badge{font-weight:600;color:var(--ink)}
-.read-text{font-size:17px}
-.btn,.tab.active{font-weight:600;color:var(--ink)}
-.tab{font-weight:500}
-.site-nav a,.site-nav button{font-size:16px;font-weight:500}
-strong{font-weight:600}
-.accent{display:block;font-family:var(--font-accent);font-weight:500;font-size:21px;line-height:1.2;color:var(--yellow);margin:0 0 4px}
 @media (max-width:600px){
   h1,.prompt,.page-title{font-size:29px}
-  h2,.helpline h2,.policy h2{font-size:22px}
+  h2{font-size:22px}
+  .helpline h2{font-size:18px}
 }
