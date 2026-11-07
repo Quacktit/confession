@@ -7,22 +7,32 @@
     <a class="brand" href="/confessions.html">unspoken<span>adc</span></a>
     <nav class="site-nav"><a href="/confessions.html">Confessions</a><button id="logout" type="button">Log out</button></nav>
   </header>
-  <main class="container">
-    <h1 class="page-title">Review queue</h1>
-    <p class="muted">Edit if needed (for example, to remove names or identifying details), then approve or reject.</p>
-    <section id="queue"></section>
-    <h2 class="section-title">All posts</h2>
-        <div class="admin-toolbar">
-      <select id="status-filter" class="search">
-        <option value="">All</option>
-        <option value="approved">Published</option>
-        <option value="pending">In review</option>
-        <option value="private">Private</option>
-        <option value="rejected">Rejected</option>
-      </select>
-      <button id="sort-btn" class="btn" type="button">Newest first ↓</button>
+    <main class="container">
+    <section id="gate">
+      <h1 class="page-title">Reviewer access</h1>
+      <form id="gate-form">
+        <input class="field" name="key" type="password" placeholder="Admin key" autocomplete="off" required>
+        <p id="gate-msg" class="error"></p>
+        <button class="btn" type="submit">Unlock</button>
+      </form>
+    </section>
+    <div id="panel" hidden>
+      <h1 class="page-title">Review queue</h1>
+      <p class="muted">Edit if needed (for example, to remove names or identifying details), then approve or reject.</p>
+      <section id="queue"></section>
+      <h2 class="section-title">All posts</h2>
+      <div class="admin-toolbar">
+        <select id="status-filter" class="search">
+          <option value="">All</option>
+          <option value="approved">Published</option>
+          <option value="pending">In review</option>
+          <option value="private">Private</option>
+          <option value="rejected">Rejected</option>
+        </select>
+        <button id="sort-btn" class="btn" type="button">Newest first ↓</button>
+      </div>
+      <section id="all-posts"></section>
     </div>
-    <section id="all-posts"></section>
   </main>
   <footer class="site-footer">unspokenadc · reviewer panel</footer>
 <script src="/js/global.js"></script></body></html>
