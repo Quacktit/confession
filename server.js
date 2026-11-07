@@ -90,6 +90,18 @@ app.post('/api/logout', (req, res) => {
 });
 const isAdmin = (uid) => { const u = db.users.find((x) => x.id === uid); return !!(u && ADMIN_KEY && u.key === ADMIN_KEY); };
 const adminOnly = (req, res, next) => (isAdmin(req.uid) ? next() : res.status(403).json({ error: 'Not allowed.' }));
+
+app.put('/api/confessions/:id', auth, (req, res) => {
+  const p = db.posts.find((x) => x.id === req.params.id && x.uid === req.uid);
+  if (!p) return res.status(404).json({ error: 'Post not found.' });
+  const text = String(req.body.text || '').trim();
+  if (!text) return res.status(400).json({ error: 'Write something first.' });
+  if (text === p.text) return res.json({ ok: true, changed: false });
+  p.original = p.original || p.text;
+  p.text = text; p.edited = true; p.status = 'pending';
+  save(); res.json({ ok: true, changed: true });
+});
+
 app.get('/api/me', auth, (req, res) => res.json({ ok: true, admin: isAdmin(req.uid) }));
 
 // Public shape never includes author info.
