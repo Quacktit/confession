@@ -120,29 +120,21 @@ async function initMyConfessions() {
     });
   }
 
-  function postCard(post) {
+    function postCard(post) {
     const c = el('article', 'card');
     const top = el('div', 'card-top');
     const label = post.status === 'pending' ? 'IN REVIEW' : post.status === 'rejected' ? 'NOT PUBLISHED' : '';
     top.append(label ? el('span', 'badge', label) : el('span'));
-    const wrap = el('div', 'menu-wrap');
-    const dots = el('button', 'dots-btn', '⋮'); dots.type = 'button'; dots.setAttribute('aria-label', 'Post options');
-    const menu = el('div', 'menu');
-    const editBtn = el('button', 'menu-item', 'Edit'); editBtn.type = 'button';
-    menu.append(editBtn); wrap.append(dots, menu); top.append(wrap);
+    const editBtn = el('button', 'btn btn-sm', 'Edit'); editBtn.type = 'button';
+    top.append(editBtn);
     const text = el('p', 'card-text', post.text);
     c.append(top, text, el('div', 'card-meta', formatDate(post.createdAt)));
     if (post.status === 'pending') c.append(el('p', 'review-note', 'This post is being reviewed before it is published.'));
     if (post.status === 'rejected') c.append(el('p', 'review-note', 'This post was not published. Edit it and it will be reviewed again.'));
-    dots.addEventListener('click', (e) => {
-      e.stopPropagation();
-      document.querySelectorAll('.menu-wrap.open').forEach((w) => { if (w !== wrap) w.classList.remove('open'); });
-      wrap.classList.toggle('open');
-    });
-    editBtn.addEventListener('click', () => { wrap.classList.remove('open'); startEdit(text, post); });
+    editBtn.addEventListener('click', () => { editBtn.hidden = true; startEdit(text, post); });
     return c;
   }
-
+  
   async function load() {
     const { posts, draft } = await api('/api/my');
     list.replaceChildren();
