@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>unspokenadc · Confessions</title>
+<link rel="stylesheet" href="/css/global.css"></head>
+<body data-page="confessions">
+  <header class="site-header">
+    <a class="brand" href="/confessions.html">unspoken<span>adc</span></a>
+    <nav class="site-nav">
+      <a href="/confessions.html" class="active">Confessions</a>
+      <a href="/my-confessions.html">My Confessions</a>
+      <a href="/privacy.html">Privacy Policy</a>
+      <button id="logout" type="button">Log out</button>
+    </nav>
+  </header>
+  <main class="container">
+    <h1 class="prompt">Write anything you want…</h1>
+    <textarea id="write-box" class="write-box" placeholder="Say what you can't say out loud. No one will know it's you."></textarea>
+    <div class="write-actions"><span id="save-status" class="muted"></span><button id="post-btn" class="btn" type="button">Post anonymously</button></div>
+    <section class="helpline">
+      <h2>Need to talk to someone?</h2>
+      <p>Tele-MANAS (free, 24x7, India): <strong>14416</strong> or <strong>1800-891-4416</strong></p>
+      <p>In an emergency call <strong>112</strong>. You are not alone, and reaching out is okay.</p>
+    </section>
+    <section class="feed-bar">
+      <div class="tabs">
+        <button class="tab active" data-sort="latest" type="button">Latest</button>
+        <button class="tab" data-sort="popular" type="button">Popular</button>
+        <button class="tab" data-sort="relevant" type="button">Relevant</button>
+      </div>
+      <input id="search" class="search" type="search" placeholder="Search confessions">
+    </section>
+    <section id="feed"></section>
+  </main>
+  <footer class="site-footer">unspokenadc · an anonymous space for ADC students</footer>
+<script src="/js/global.js"></script></body></html>
