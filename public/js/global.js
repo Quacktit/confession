@@ -257,6 +257,7 @@ async function initConfession() {
   } catch (e) { text.textContent = e.message; }
 }
 
+
 document.addEventListener('DOMContentLoaded', () => {
  const pages = { confessions: initConfessions, confession: initConfession, 'my-confessions': initMyConfessions, privacy: initPrivacy, login: initAuth, admin: initAdmin };
   const init = pages[document.body.dataset.page];
