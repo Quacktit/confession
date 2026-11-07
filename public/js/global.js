@@ -181,30 +181,68 @@ async function initAdmin() {
   bindLogout();
   const me = await api('/api/me');
   if (!me.admin) { window.location.href = '/confessions.html'; return; }
-  const list = document.getElementById('queue');
+  const queue = document.getElementById('queue');
+  const all = document.getElementById('all-posts');
+  const filter = document.getElementById('status-filter');
 
-  async function act(id, action, text, card) {
-    try { await api('/api/admin/posts/' + id, { method: 'PUT', body: JSON.stringify({ action, text }) }); card.remove(); empty(); }
-    catch (e) { alert(e.message); }
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text) e.textContent = text;
+    return e;
   }
-  function empty() {
-    if (!list.children.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = 'No posts waiting for review.'; list.append(p); }
+  function btn(row, label, cls, fn) {
+    const b = el('button', cls, label); b.type = 'button';
+    b.addEventListener('click', fn); row.append(b); return b;
   }
-  const posts = await api('/api/admin/pending');
-  posts.forEach((post) => {
-    const card = document.createElement('article'); card.className = 'review-card';
-    const meta = document.createElement('div'); meta.className = 'muted'; meta.textContent = formatDate(post.createdAt);
-    const ta = document.createElement('textarea'); ta.className = 'review-text'; ta.value = post.text;
-    const row = document.createElement('div'); row.className = 'review-actions';
-    const ok = document.createElement('button'); ok.className = 'btn'; ok.type = 'button'; ok.textContent = 'Approve & publish';
-    const no = document.createElement('button'); no.className = 'btn btn-reject'; no.type = 'button'; no.textContent = 'Reject';
-    ok.addEventListener('click', () => act(post.id, 'approve', ta.value, card));
-    no.addEventListener('click', () => act(post.id, 'reject', '', card));
-    row.append(ok, no); card.append(meta, ta, row); list.append(card);
-  });
-  empty();
+  async function run(fn) { try { await fn(); await refresh(); } catch (e) { alert(e.message); } }
+
+  function queueCard(post) {
+    const c = el('article', 'review-card');
+    const ta = el('textarea', 'review-text'); ta.value = post.text;
+    const row = el('div', 'review-actions');
+    btn(row, 'Approve & publish', 'btn', () => run(() => api('/api/admin/posts/' + post.id, { method: 'PUT', body: JSON.stringify({ action: 'approve', text: ta.value }) })));
+    btn(row, 'Reject', 'btn btn-reject', () => run(() => api('/api/admin/posts/' + post.id, { method: 'PUT', body: JSON.stringify({ action: 'reject' }) })));
+    c.append(el('div', 'muted', formatDate(post.createdAt)), ta, row);
+    return c;
+  }
+
+  function allCard(post) {
+    const c = el('article', 'review-card');
+    const head = el('div', 'admin-top');
+    head.append(el('span', 'badge', post.status.toUpperCase()), el('span', 'muted', formatDate(post.createdAt) + ' · ' + post.views + ' reads'));
+    const ta = el('textarea', 'review-text'); ta.value = post.text;
+    const row = el('div', 'review-actions');
+    const info = el('p', 'review-note');
+    const update = (body) => run(() => api('/api/admin/posts/' + post.id + '/update', { method: 'PUT', body: JSON.stringify(body) }));
+    btn(row, 'Save text', 'btn', () => update({ text: ta.value }));
+    if (post.status === 'approved') btn(row, 'Make private', 'btn btn-reject', () => update({ status: 'private' }));
+    else btn(row, 'Publish', 'btn', () => update({ text: ta.value, status: 'approved' }));
+    btn(row, 'Delete', 'btn btn-reject', () => { if (confirm('Delete this post permanently?')) run(() => api('/api/admin/posts/' + post.id, { method: 'DELETE' })); });
+    btn(row, 'Reveal author', 'btn btn-reject', async () => {
+      if (!confirm('Reveal the author email for this post? This action is logged.')) return;
+      try {
+        const r = await api('/api/admin/posts/' + post.id + '/author');
+        info.textContent = r.email ? 'Author: ' + r.email : 'Email not available yet for this account (saved at their next login).';
+      } catch (e) { alert(e.message); }
+    });
+    c.append(head, ta, row, info);
+    return c;
+  }
+
+  async function refresh() {
+    queue.replaceChildren(); all.replaceChildren();
+    const pending = await api('/api/admin/pending');
+    pending.forEach((p) => queue.append(queueCard(p)));
+    if (!pending.length) queue.append(el('p', 'muted', 'No posts waiting for review.'));
+    const s = filter.value;
+    const posts = await api('/api/admin/posts' + (s ? '?status=' + s : ''));
+    posts.forEach((p) => all.append(allCard(p)));
+    if (!posts.length) all.append(el('p', 'muted', 'No posts here.'));
+  }
+  filter.addEventListener('change', refresh);
+  await refresh();
 }
-
 async function initConfession() {
   await requireAuth();
   bindLogout();
