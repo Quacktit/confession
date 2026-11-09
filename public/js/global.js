@@ -197,6 +197,7 @@ async function adminApi(url, options = {}) {
 
 async function initAdmin() {
   bindLogout();
+  if (window.location.search) window.history.replaceState(null, '', window.location.pathname);
   const gate = document.getElementById('gate');
   const gateForm = document.getElementById('gate-form');
   const gateMsg = document.getElementById('gate-msg');
@@ -205,6 +206,10 @@ async function initAdmin() {
   const all = document.getElementById('all-posts');
   const filter = document.getElementById('status-filter');
   const sortBtn = document.getElementById('sort-btn');
+  const menuBtn = document.getElementById('menu-btn');
+  const sideMenu = document.getElementById('side-menu');
+  const overlay = document.getElementById('menu-overlay');
+  const views = { queue: document.getElementById('view-queue'), posts: document.getElementById('view-posts'), users: document.getElementById('view-users') };
   let newest = true;
 
   function el(tag, cls, text) {
@@ -218,6 +223,7 @@ async function initAdmin() {
     b.addEventListener('click', fn); row.append(b); return b;
   }
   async function run(fn) { try { await fn(); await refresh(); } catch (e) { alert(e.message); } }
+  const authorLine = (post) => el('p', 'author-line', 'Author: ' + (post.author || 'not available'));
 
   function queueCard(post) {
     const c = el('article', 'review-card');
@@ -225,7 +231,7 @@ async function initAdmin() {
     const row = el('div', 'review-actions');
     btn(row, 'Approve & publish', 'btn', () => run(() => adminApi('/api/admin/posts/' + post.id, { method: 'PUT', body: JSON.stringify({ action: 'approve', text: ta.value }) })));
     btn(row, 'Reject', 'btn btn-reject', () => run(() => adminApi('/api/admin/posts/' + post.id, { method: 'PUT', body: JSON.stringify({ action: 'reject' }) })));
-    c.append(el('div', 'muted', formatDate(post.createdAt)), ta, row);
+    c.append(el('div', 'muted', formatDate(post.createdAt)), authorLine(post), ta, row);
     return c;
   }
 
@@ -235,7 +241,6 @@ async function initAdmin() {
     head.append(el('span', 'badge', post.status.toUpperCase()), el('span', 'muted', formatDate(post.createdAt) + ' · ' + post.views + ' reads'));
     const ta = el('textarea', 'review-text'); ta.value = post.text;
     const row = el('div', 'review-actions');
-    const info = el('p', 'review-note');
     const update = (body) => run(() => adminApi('/api/admin/posts/' + post.id + '/update', { method: 'PUT', body: JSON.stringify(body) }));
     const sel = el('select', 'search');
     [['approved', 'Published'], ['pending', 'In review'], ['private', 'Private'], ['rejected', 'Rejected']].forEach(([v, t]) => {
@@ -245,14 +250,7 @@ async function initAdmin() {
     row.append(sel);
     btn(row, 'Save text', 'btn', () => update({ text: ta.value }));
     btn(row, 'Delete', 'btn btn-reject', () => { if (confirm('Delete this post permanently?')) run(() => adminApi('/api/admin/posts/' + post.id, { method: 'DELETE' })); });
-    btn(row, 'Reveal author', 'btn btn-reject', async () => {
-      if (!confirm('Reveal the author email for this post? This action is logged.')) return;
-      try {
-        const r = await adminApi('/api/admin/posts/' + post.id + '/author');
-        info.textContent = r.email ? 'Author: ' + r.email : 'Email not available for this account.';
-      } catch (e) { alert(e.message); }
-    });
-    c.append(head, ta, row, info);
+    c.append(head, authorLine(post), ta, row);
     return c;
   }
 
@@ -268,12 +266,22 @@ async function initAdmin() {
     if (!posts.length) all.append(el('p', 'muted', 'No posts here.'));
   }
 
+  function setMenu(open) { sideMenu.hidden = !open; overlay.hidden = !open; }
+  function showView(name) {
+    Object.keys(views).forEach((k) => { views[k].hidden = k !== name; });
+    sideMenu.querySelectorAll('.side-item').forEach((b) => b.classList.toggle('active', b.dataset.view === name));
+    setMenu(false);
+  }
+
   async function unlock(key) {
     sessionStorage.setItem('adminKey', key);
-    try { await refresh(); gate.hidden = true; panel.hidden = false; }
+    try { await refresh(); gate.hidden = true; panel.hidden = false; menuBtn.hidden = false; showView('queue'); }
     catch (e) { sessionStorage.removeItem('adminKey'); gateMsg.textContent = e.message; }
   }
 
+  menuBtn.addEventListener('click', () => setMenu(sideMenu.hidden));
+  overlay.addEventListener('click', () => setMenu(false));
+  sideMenu.querySelectorAll('.side-item').forEach((b) => b.addEventListener('click', () => showView(b.dataset.view)));
   filter.addEventListener('change', () => run(async () => {}));
   sortBtn.addEventListener('click', () => {
     newest = !newest;
@@ -284,9 +292,10 @@ async function initAdmin() {
     e.preventDefault(); gateMsg.textContent = '';
     unlock(gateForm.key.value); gateForm.key.value = '';
   });
+
   const removeForm = document.getElementById('remove-form');
   const removeMsg = document.getElementById('remove-msg');
-  if (removeForm) removeForm.addEventListener('submit', async (e) => {
+  removeForm.addEventListener('submit', async (e) => {
     e.preventDefault(); removeMsg.textContent = '';
     if (!confirm('This cannot be undone. Continue?')) return;
     try {
@@ -294,6 +303,7 @@ async function initAdmin() {
       removeMsg.textContent = 'Done.'; removeForm.reset(); await refresh();
     } catch (err) { removeMsg.textContent = err.message; }
   });
+
   if (sessionStorage.getItem('adminKey')) unlock(sessionStorage.getItem('adminKey'));
 }
 
