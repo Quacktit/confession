@@ -196,7 +196,6 @@ async function adminApi(url, options = {}) {
 }
 
 async function initAdmin() {
-  bindLogout();
   if (window.location.search) window.history.replaceState(null, '', window.location.pathname);
   const gate = document.getElementById('gate');
   const gateForm = document.getElementById('gate-form');
@@ -278,6 +277,20 @@ async function initAdmin() {
     try { await refresh(); gate.hidden = true; panel.hidden = false; menuBtn.hidden = false; showView('queue'); }
     catch (e) { sessionStorage.removeItem('adminKey'); gateMsg.textContent = e.message; }
   }
+
+  // "Log out" on this page only locks the admin panel; the normal account session is untouched.
+  function lock() {
+    sessionStorage.removeItem('adminKey');
+    queue.replaceChildren(); all.replaceChildren();
+    setMenu(false);
+    menuBtn.hidden = true;
+    panel.hidden = true;
+    gate.hidden = false;
+    gateMsg.textContent = '';
+    filter.value = '';
+    removeForm.reset(); removeMsg.textContent = '';
+  }
+  document.getElementById('logout').addEventListener('click', lock);
 
   menuBtn.addEventListener('click', () => setMenu(sideMenu.hidden));
   overlay.addEventListener('click', () => setMenu(false));
