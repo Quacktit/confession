@@ -7,14 +7,16 @@
     <div class="auth-card">
       <div class="brand">unspoken<span>ADC</span><p class="accent">anonymous</p></div>
       <h1 id="auth-title">Log in</h1>
-      <p class="muted">Your account is only for access. Nobody sees who you are.</p>
-      <form id="auth-form">
+      <p class="muted">Other users never see who you are. The site owner can see your email for safety or legal reasons. Read the <a href="/privacy.html">Privacy Policy</a>.</p>
+      <form method="post" id="auth-form">
         <input class="field" name="email" type="email" placeholder="Email" required autocomplete="email">
         <input class="field" name="password" type="password" placeholder="Password (min 8 characters)" required minlength="8" autocomplete="current-password">
         <p id="auth-error" class="error"></p>
         <button id="auth-submit" class="btn" type="submit">Log in</button>
       </form>
+      <p class="switch muted"><a href="/forgot.html">Forgot password?</a></p>
       <p class="switch muted"><span id="auth-prompt">New here?</span> <button id="auth-toggle" type="button">Create an account</button></p>
     </div>
   </main>
+  <footer class="site-footer"><a href="/privacy.html">Privacy Policy</a> · unspokenadc · an anonymous space for ADC students</footer>
 <script src="/js/global.js"></script></body></html>

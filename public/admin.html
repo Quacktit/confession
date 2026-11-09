@@ -10,7 +10,7 @@
     <main class="container">
     <section id="gate">
       <h1 class="page-title">Reviewer access</h1>
-      <form id="gate-form">
+      <form method="post" id="gate-form">
         <input class="field" name="key" type="password" placeholder="Admin key" autocomplete="off" required>
         <p id="gate-msg" class="error"></p>
         <button class="btn" type="submit">Unlock</button>
@@ -32,6 +32,17 @@
         <button id="sort-btn" class="btn" type="button">Newest first ↓</button>
       </div>
       <section id="all-posts"></section>
+      <h2 class="section-title">Remove a user's data</h2>
+      <form method="post" id="remove-form" class="admin-toolbar">
+        <input class="search" name="email" type="email" placeholder="User email" required>
+        <select class="search" name="mode">
+          <option value="email">Erase stored email only</option>
+          <option value="account-keep-posts">Delete account, keep posts</option>
+          <option value="account">Delete account and posts</option>
+        </select>
+        <button class="btn" type="submit">Remove</button>
+      </form>
+      <p id="remove-msg" class="review-note"></p>
     </div>
   </main>
   <footer class="site-footer">unspokenadc · reviewer panel</footer>

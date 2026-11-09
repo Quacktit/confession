@@ -15,6 +15,19 @@
     <h1 class="page-title">My Confessions</h1>
     <p id="my-notice" class="notice" hidden></p>
     <section id="my-list"></section>
+    <section class="danger-zone">
+      <h2>Delete account</h2>
+      <p class="muted">This permanently deletes your account, your stored email and your drafts. Your confessions stay on the site, but they will no longer be linked to you, so you won't be able to see or edit them afterwards.</p>
+      <button id="delete-open" class="btn btn-danger" type="button">Delete my account</button>
+      <form method="post" id="delete-form" hidden>
+        <input class="field" name="password" type="password" placeholder="Enter your password to confirm" required autocomplete="current-password">
+        <p id="delete-msg" class="error"></p>
+        <div class="review-actions">
+          <button class="btn btn-danger" type="submit">Permanently delete</button>
+          <button id="delete-cancel" class="btn btn-reject" type="button">Cancel</button>
+        </div>
+      </form>
+    </section>
   </main>
      <footer class="site-footer"><a href="/privacy.html">Privacy Policy</a> · unspokenadc · an anonymous space for ADC students</footer>
 <script src="/js/global.js"></script></body></html>
