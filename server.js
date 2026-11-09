@@ -300,8 +300,9 @@ app.put('/api/draft', auth, (req, res) => {
 
 /* ---------- admin (protected by ADMIN_KEY header) ---------- */
 app.get('/api/admin/pending', adminOnly, (req, res) => {
-    logAuthorView();
+  logAuthorView();
   res.json(db.posts.filter((p) => p.status === 'pending').sort((a, b) => a.createdAt - b.createdAt).map((p) => ({ ...pub(p), author: authorOf(p) })));
+});
 
 app.put('/api/admin/posts/:id', adminOnly, (req, res) => {
   const p = db.posts.find((x) => x.id === req.params.id && x.status === 'pending');
@@ -320,8 +321,9 @@ app.put('/api/admin/posts/:id', adminOnly, (req, res) => {
 app.get('/api/admin/posts', adminOnly, (req, res) => {
   const s = req.query.status;
   const list = db.posts.filter((p) => !s || p.status === s).sort((a, b) => b.createdAt - a.createdAt);
-    logAuthorView();
+  logAuthorView();
   res.json(list.map((p) => ({ ...pub(p), status: p.status, author: authorOf(p) })));
+});
 
 app.put('/api/admin/posts/:id/update', adminOnly, (req, res) => {
   const p = db.posts.find((x) => x.id === req.params.id);
@@ -345,6 +347,13 @@ app.delete('/api/admin/posts/:id', adminOnly, (req, res) => {
   db.posts.splice(i, 1); save(); res.json({ ok: true });
 });
 
+app.get('/api/admin/posts/:id/author', adminOnly, (req, res) => {
+  const p = db.posts.find((x) => x.id === req.params.id);
+  if (!p) return res.status(404).json({ error: 'Post not found.' });
+  const u = db.users.find((x) => x.id === p.uid);
+  db.audit.push({ at: Date.now(), postId: p.id });
+  save(); res.json({ email: (u && (dec(u.emailEnc) || u.email)) || null });
+});
 
 app.post('/api/admin/users/remove', adminOnly, (req, res) => {
   const { email = '', mode = '' } = req.body;
