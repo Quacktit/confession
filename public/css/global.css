@@ -126,6 +126,10 @@ select.search option:checked{background:var(--yellow);color:var(--ink)}
 .pw-toggle:hover{color:var(--yellow)}
 .pw-toggle svg{width:20px;height:20px}
 
+.error.success{color:var(--yellow)}
+.danger-zone{margin-top:48px;padding-top:24px;border-top:1px solid var(--charcoal-2)}
+.danger-zone h2{font-size:22px;color:#ff6b6b}
+.btn-danger{background:#ff6b6b;color:var(--ink)}
 
 .header-left{display:flex;align-items:center;gap:14px}
 .menu-btn{background:none;border:1px solid var(--charcoal-2);border-radius:10px;padding:10px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
