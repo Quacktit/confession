@@ -123,7 +123,8 @@ async function initMyConfessions() {
     function postCard(post) {
     const c = el('article', 'card');
     const top = el('div', 'card-top');
-    const label = post.status === 'pending' ? 'IN REVIEW' : post.status === 'rejected' ? 'NOT PUBLISHED' : post.status === 'private' ? 'HIDDEN' : '';    top.append(label ? el('span', 'badge', label) : el('span'));
+    const label = post.status === 'pending' ? 'IN REVIEW' : post.status === 'rejected' ? 'NOT PUBLISHED' : post.status === 'private' ? 'HIDDEN' : '';
+    top.append(label ? el('span', 'badge', label) : el('span'));
     const editBtn = el('button', 'btn btn-sm', 'Edit'); editBtn.type = 'button';
     if (post.status !== 'private') top.append(editBtn);
     const text = el('p', 'card-text', post.text);
@@ -143,12 +144,26 @@ async function initMyConfessions() {
     if (!draft && !posts.length) list.append(el('p', 'empty', 'You have not shared anything yet.'));
   }
 
+  const delOpen = document.getElementById('delete-open');
+  const delForm = document.getElementById('delete-form');
+  const delMsg = document.getElementById('delete-msg');
+  delOpen.addEventListener('click', () => { delForm.hidden = false; delOpen.hidden = true; });
+  document.getElementById('delete-cancel').addEventListener('click', () => { delForm.hidden = true; delOpen.hidden = false; delForm.reset(); delMsg.textContent = ''; });
+  delForm.addEventListener('submit', async (e) => {
+    e.preventDefault(); delMsg.textContent = '';
+    if (!confirm('Delete your account permanently? This cannot be undone.')) return;
+    try {
+      await api('/api/account/delete', { method: 'POST', body: JSON.stringify({ password: delForm.password.value }) });
+      window.location.href = '/login.html';
+    } catch (err) { delMsg.textContent = err.message; }
+  });
+
   await load();
 }
 
 async function initPrivacy() {
-  try { await requireAuth(); } catch (e) { return; }
-  bindLogout();
+  try { await api('/api/me'); bindLogout(); }
+  catch (e) { const b = document.getElementById('logout'); if (b) b.remove(); }
 }
 
 function initAuth() {
@@ -269,6 +284,16 @@ async function initAdmin() {
     e.preventDefault(); gateMsg.textContent = '';
     unlock(gateForm.key.value); gateForm.key.value = '';
   });
+  const removeForm = document.getElementById('remove-form');
+  const removeMsg = document.getElementById('remove-msg');
+  if (removeForm) removeForm.addEventListener('submit', async (e) => {
+    e.preventDefault(); removeMsg.textContent = '';
+    if (!confirm('This cannot be undone. Continue?')) return;
+    try {
+      await adminApi('/api/admin/users/remove', { method: 'POST', body: JSON.stringify({ email: removeForm.email.value, mode: removeForm.mode.value }) });
+      removeMsg.textContent = 'Done.'; removeForm.reset(); await refresh();
+    } catch (err) { removeMsg.textContent = err.message; }
+  });
   if (sessionStorage.getItem('adminKey')) unlock(sessionStorage.getItem('adminKey'));
 }
 
@@ -310,11 +335,38 @@ function addPasswordToggles() {
   });
 }
 
+function initForgot() {
+  const form = document.getElementById('forgot-form');
+  const msg = document.getElementById('forgot-msg');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault(); msg.className = 'error'; msg.textContent = '';
+    try {
+      await api('/api/forgot', { method: 'POST', body: JSON.stringify({ email: form.email.value }) });
+      msg.className = 'error success';
+      msg.textContent = 'If an account exists for that email, a reset link has been sent. It expires in 30 minutes.';
+    } catch (err) { msg.textContent = err.message; }
+  });
+}
+
+function initReset() {
+  const form = document.getElementById('reset-form');
+  const msg = document.getElementById('reset-msg');
+  const token = new URLSearchParams(window.location.search).get('token') || '';
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault(); msg.className = 'error'; msg.textContent = '';
+    if (form.password.value !== form.confirm.value) { msg.textContent = 'Passwords do not match.'; return; }
+    try {
+      await api('/api/reset', { method: 'POST', body: JSON.stringify({ token, password: form.password.value }) });
+      msg.className = 'error success';
+      msg.textContent = 'Password updated. Taking you to log in…';
+      setTimeout(() => { window.location.href = '/login.html'; }, 1500);
+    } catch (err) { msg.textContent = err.message; }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
- const pages = { confessions: initConfessions, confession: initConfession, 'my-confessions': initMyConfessions, privacy: initPrivacy, login: initAuth, admin: initAdmin };
+  addPasswordToggles();
+  const pages = { confessions: initConfessions, confession: initConfession, 'my-confessions': initMyConfessions, privacy: initPrivacy, login: initAuth, admin: initAdmin, forgot: initForgot, reset: initReset };
   const init = pages[document.body.dataset.page];
   if (init) init();
-  document.addEventListener('DOMContentLoaded', () => {
-  addPasswordToggles();
-  const pages = { ... };   // leave the rest exactly as it is
 });
