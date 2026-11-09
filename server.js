@@ -79,16 +79,29 @@ const dec = (s) => {
 const pub = (p) => ({ id: p.id, text: p.text, createdAt: p.createdAt, views: p.views });
 
 async function sendMail(to, subject, text) {
-  if (!process.env.BREVO_API_KEY || !process.env.MAIL_FROM || !process.env.APP_URL) {
-    console.log('Mail is not configured; reset email not sent.');
+  const appUrl = process.env.APP_URL;
+  if (process.env.MAIL_WEBHOOK_URL && process.env.MAIL_WEBHOOK_SECRET && appUrl) {
+    // Free option: a Google Apps Script web app that sends through Gmail.
+    const r = await fetch(process.env.MAIL_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ secret: process.env.MAIL_WEBHOOK_SECRET, to, subject, text }),
+      redirect: 'follow'
+    });
+    const out = (await r.text()).trim();
+    if (!r.ok || out !== 'ok') throw new Error('Mail relay failed: ' + r.status + ' ' + out.slice(0, 80));
     return;
   }
-  const r = await fetch('https://api.brevo.com/v3/smtp/email', {
-    method: 'POST',
-    headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json', accept: 'application/json' },
-    body: JSON.stringify({ sender: { name: 'unspokenadc', email: process.env.MAIL_FROM }, to: [{ email: to }], subject, textContent: text })
-  });
-  if (!r.ok) throw new Error('Mail API returned ' + r.status);
+  if (process.env.BREVO_API_KEY && process.env.MAIL_FROM && appUrl) {
+    const r = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify({ sender: { name: 'unspokenadc', email: process.env.MAIL_FROM }, to: [{ email: to }], subject, textContent: text })
+    });
+    if (!r.ok) throw new Error('Mail API returned ' + r.status);
+    return;
+  }
+  console.log('Mail is not configured; reset email not sent.');
 }
 
 /* ---------- rate limiting + admin gate ---------- */
@@ -147,7 +160,7 @@ const setToken = (res, uid) => {
   res.setHeader('Set-Cookie', `token=${t}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000${SECURE}`);
 };
 
-app.use(['/api/login', '/api/signup', '/api/forgot', '/api/reset'], limit(10, 15 * 60 * 1000));
+app.use(['/api/login', '/api/signup', '/api/forgot', '/api/reset', '/api/account/delete'], limit(10, 15 * 60 * 1000));
 
 app.post('/api/signup', (req, res) => {
   const { email = '', password = '' } = req.body;
@@ -164,13 +177,26 @@ app.post('/api/login', (req, res) => {
   const { email = '', password = '' } = req.body;
   const user = db.users.find((u) => u.key === emailKey(email));
   if (!user || !bcrypt.compareSync(password, user.hash)) return res.status(401).json({ error: 'Wrong email or password.' });
-  if (!user.emailEnc && EKEY) { user.emailEnc = enc(email.trim().toLowerCase()); save(); }
+  if (!user.emailEnc && !user.noEmail && EKEY) { user.emailEnc = enc(email.trim().toLowerCase()); save(); }
   setToken(res, user.id); res.json({ ok: true });
 });
 
 app.post('/api/logout', (req, res) => {
   res.setHeader('Set-Cookie', `token=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0${SECURE}`); res.json({ ok: true });
 });
+app.post('/api/account/delete', auth, (req, res) => {
+  const user = db.users.find((u) => u.id === req.uid);
+  if (!user || !bcrypt.compareSync(String(req.body.password || ''), user.hash)) return res.status(403).json({ error: 'Wrong password.' });
+  // Posts stay on the site, but are unlinked from the account for good.
+  db.posts.forEach((p) => { if (p.uid === user.id) p.uid = null; });
+  delete db.drafts[user.id];
+  db.resets = db.resets.filter((r) => r.uid !== user.id);
+  db.users = db.users.filter((u) => u.id !== user.id);
+  save();
+  res.setHeader('Set-Cookie', `token=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0${SECURE}`);
+  res.json({ ok: true });
+});
+
 app.get('/api/me', auth, (req, res) => res.json({ ok: true }));
 
 /* ---------- password reset ---------- */
@@ -316,6 +342,22 @@ app.get('/api/admin/posts/:id/author', adminOnly, (req, res) => {
   const u = db.users.find((x) => x.id === p.uid);
   db.audit.push({ at: Date.now(), postId: p.id });
   save(); res.json({ email: (u && (dec(u.emailEnc) || u.email)) || null });
+});
+
+app.post('/api/admin/users/remove', adminOnly, (req, res) => {
+  const { email = '', mode = '' } = req.body;
+  const u = db.users.find((x) => x.key === emailKey(email));
+  if (!u) return res.status(404).json({ error: 'No account found for that email.' });
+  if (mode === 'email') {
+    delete u.emailEnc; delete u.email; u.noEmail = true;
+  } else if (mode === 'account' || mode === 'account-keep-posts') {
+    if (mode === 'account') db.posts = db.posts.filter((p) => p.uid !== u.id);
+    else db.posts.forEach((p) => { if (p.uid === u.id) p.uid = null; });
+    delete db.drafts[u.id];
+    db.resets = db.resets.filter((r) => r.uid !== u.id);
+    db.users = db.users.filter((x) => x.id !== u.id);
+  } else return res.status(400).json({ error: 'Invalid option.' });
+  save(); res.json({ ok: true });
 });
 
 /* ---------- static site + start ---------- */
