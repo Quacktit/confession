@@ -3,11 +3,21 @@
 <title>unspokenadc · Review</title>
 <link rel="stylesheet" href="/css/global.css"></head>
 <body data-page="admin">
-  <header class="site-header">
-    <a class="brand" href="/confessions.html">unspoken<span>adc</span></a>
+    <header class="site-header">
+    <div class="header-left">
+      <button id="menu-btn" class="menu-btn" type="button" aria-label="Open menu" hidden><span></span><span></span><span></span></button>
+      <a class="brand" href="/confessions.html">unspoken<span>adc</span></a>
+    </div>
     <nav class="site-nav"><a href="/confessions.html">Confessions</a><button id="logout" type="button">Log out</button></nav>
   </header>
-    <main class="container">
+  <div id="menu-overlay" class="menu-overlay" hidden></div>
+  <nav id="side-menu" class="side-menu" hidden>
+    <p class="side-title">Admin actions</p>
+    <button class="side-item active" data-view="queue" type="button">Review queue</button>
+    <button class="side-item" data-view="posts" type="button">All posts</button>
+    <button class="side-item" data-view="users" type="button">Remove a user's data</button>
+  </nav>
+      <main class="container">
     <section id="gate">
       <h1 class="page-title">Reviewer access</h1>
       <form method="post" id="gate-form">
@@ -17,32 +27,38 @@
       </form>
     </section>
     <div id="panel" hidden>
-      <h1 class="page-title">Review queue</h1>
-      <p class="muted">Edit if needed (for example, to remove names or identifying details), then approve or reject.</p>
-      <section id="queue"></section>
-      <h2 class="section-title">All posts</h2>
-      <div class="admin-toolbar">
-        <select id="status-filter" class="search">
-          <option value="">All</option>
-          <option value="approved">Published</option>
-          <option value="pending">In review</option>
-          <option value="private">Private</option>
-          <option value="rejected">Rejected</option>
-        </select>
-        <button id="sort-btn" class="btn" type="button">Newest first ↓</button>
-      </div>
-      <section id="all-posts"></section>
-      <h2 class="section-title">Remove a user's data</h2>
-      <form method="post" id="remove-form" class="admin-toolbar">
-        <input class="search" name="email" type="email" placeholder="User email" required>
-        <select class="search" name="mode">
-          <option value="email">Erase stored email only</option>
-          <option value="account-keep-posts">Delete account, keep posts</option>
-          <option value="account">Delete account and posts</option>
-        </select>
-        <button class="btn" type="submit">Remove</button>
-      </form>
-      <p id="remove-msg" class="review-note"></p>
+      <section id="view-queue" class="view">
+        <h1 class="page-title">Review queue</h1>
+        <p class="muted">Edit if needed (for example, to remove names or identifying details), then approve or reject.</p>
+        <section id="queue"></section>
+      </section>
+      <section id="view-posts" class="view" hidden>
+        <h1 class="page-title">All posts</h1>
+        <div class="admin-toolbar">
+          <select id="status-filter" class="search">
+            <option value="">All</option>
+            <option value="approved">Published</option>
+            <option value="pending">In review</option>
+            <option value="private">Private</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <button id="sort-btn" class="btn" type="button">Newest first ↓</button>
+        </div>
+        <section id="all-posts"></section>
+      </section>
+      <section id="view-users" class="view" hidden>
+        <h1 class="page-title">Remove a user's data</h1>
+        <form method="post" id="remove-form" class="admin-toolbar">
+          <input class="search" name="email" type="email" placeholder="User email" required>
+          <select class="search" name="mode">
+            <option value="email">Erase stored email only</option>
+            <option value="account-keep-posts">Delete account, keep posts</option>
+            <option value="account">Delete account and posts</option>
+          </select>
+          <button class="btn" type="submit">Remove</button>
+        </form>
+        <p id="remove-msg" class="review-note"></p>
+      </section>
     </div>
   </main>
   <footer class="site-footer">unspokenadc · reviewer panel</footer>
